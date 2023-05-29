@@ -1,7 +1,71 @@
-version: 3.9
+version: "3.9"
 
 services:
+  nginx:
+    container_name: nginx
+    build:
+      context: "./nginx"
+      # target: "packaged"
+      # args  :
+      #   USERNAME: ${USERNAME:-user}
+      #   USERPASS: ${USERPASS:-1234}
+      #   ROOTPASS: ${ROOTPASS:-1234}
+      #   PACKAGES: ${PACKAGES:-}
+      #   GIT_EMAIL: ${GIT_EMAIL:-}
+      #   GIT_NAME: ${GIT_NAME:-}
+    # environment:
+    #   - LANG=en_US.UTF-8
+    #   - LANGUAGE=en_US:en
+    #   - LC_ALL=en_US.UTF-8
+    #   - DEBIAN_FRONTEND=noninteractive
+    #   - DISPLAY=${DISPLAY}
+    #   - TERM=xterm
+    networks:
+      net_00:
+        ipv4_address: "12.0.0.10"
+
+  mariadb:
+    container_name: mariadb
+    build:
+      context: "./mariadb"
+      target: "base"
+      # args  :
+      #   USERNAME: ${USERNAME:-user}
+      #   USERPASS: ${USERPASS:-1234}
+      #   ROOTPASS: ${ROOTPASS:-1234}
+      #   PACKAGES: ${PACKAGES:-}
+      #   GIT_EMAIL: ${GIT_EMAIL:-}
+      #   GIT_NAME: ${GIT_NAME:-}
+    # environment:
+    #   - LANG=en_US.UTF-8
+    #   - LANGUAGE=en_US:en
+    #   - LC_ALL=en_US.UTF-8
+    #   - DEBIAN_FRONTEND=noninteractive
+    #   - DISPLAY=${DISPLAY}
+    #   - TERM=xterm
+    networks:
+      net_00:
+        ipv4_address: "12.0.0.11"
+    volumes:
+    - maria_db:/var/lib/mysql
 
 networks:
+  net_00:
+    name: net_00
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.name: net_00
+    ipam:
+      driver: default
+      config:
+        - subnet: 12.0.0.0/24
+          ip_range: 12.0.0.0/24
+          gateway: 12.0.0.1
 
 volumes:
+  maria_db:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: /home/kali/data
