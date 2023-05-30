@@ -22,6 +22,6 @@ WORKDIR		/var/www/html
 WORKDIR		/
 
 COPY		--chown=root:root www.conf /etc/php/7.3/fpm/pool.d
-COPY		--chown=root:root entrypoint.sh /run
+COPY		--chown=root:root entrypoint /run
 
-ENTRYPOINT	[ "/run/entrypoint.sh" ]
+ENTRYPOINT	[ "/run/entrypoint" ]

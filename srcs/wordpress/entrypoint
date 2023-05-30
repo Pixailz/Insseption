@@ -5,9 +5,9 @@ cd /var/www/html
 wp core download --allow-root
 
 wp config create \
-	--dbname=main_db \
-	--dbuser=mysql \
-	--dbpass="" \
+	--dbname=${DB_NAME} \
+	--dbuser=root \
+	--dbpass=${ADMIN_PASS} \
 	--dbhost=mariadb \
 	--allow-root \
 	--extra-php
@@ -15,14 +15,14 @@ wp config create \
 wp core install \
 	--url=https://brda-sil.42.fr \
 	--title="Mine Site" \
-	--admin_user="pix" \
-	--admin_password="1234" \
+	--admin_user=${ADMIN_USER} \
+	--admin_password=${ADMIN_PASS} \
 	--admin_email="pix@nowhere.com" \
 	--allow-root
 
-wp user create brda-sil \
+wp user create ${NORMAL_USER} \
 	brda-sil@nowhere.com \
-	--user_pass="abcd" \
+	--user_pass=${NORMAL_PASS} \
 	--role=subscriber \
 	--allow-root
 

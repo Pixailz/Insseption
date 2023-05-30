@@ -8,8 +8,7 @@ services:
       context: "./nginx"
       target: packed
     depends_on:
-      wordpress:
-        condition: service_healthy
+      - wordpress
     ports:
       - 443:443
     networks:
@@ -22,8 +21,14 @@ services:
     container_name: wordpress
     build:
       context: "./wordpress"
+    environment:
+      - ADMIN_PASS=${ADMIN_PASS}
+      - NORMAL_USER=${NORMAL_USER}
+      - NORMAL_PASS=${NORMAL_PASS}
+      - DB_NAME=${DB_NAME}
     depends_on:
-      - mariadb
+      mariadb:
+        condition: service_healthy
     ports:
       - 9000:9000
     networks:
@@ -37,18 +42,23 @@ services:
     build:
       context: "./mariadb"
       target: "packed"
+    environment:
+      - ADMIN_PASS=${ADMIN_PASS}
+      - NORMAL_USER=${NORMAL_USER}
+      - NORMAL_PASS=${NORMAL_PASS}
+      - DB_NAME=${DB_NAME}
     ports:
       - 3306:3306
     networks:
       net_00:
         ipv4_address: "12.0.0.12"
     volumes:
-      - maria_db:/var/www/html
+      - maria_db:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 10s
-      retries: 6
+      test: [ "CMD", "pgrep", "mysqld" ]
+      interval: 2s
+      timeout: 1s
+      retries: 10
 
 networks:
   net_00:
@@ -77,11 +87,11 @@ volumes:
     driver_opts:
       type: "none"
       o: "bind"
-      device: ${HOME}/data/nginx
+      device: ~/data/nginx
 
   wordpress_root:
     driver: local
     driver_opts:
       type: "none"
       o: "bind"
-      device: ${HOME}/data/wordpress
+      device: ~/data/wordpress
