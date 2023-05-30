@@ -1,53 +1,54 @@
 version: "3.9"
 
 services:
+
   nginx:
     container_name: nginx
     build:
       context: "./nginx"
-      # target: "packaged"
-      # args  :
-      #   USERNAME: ${USERNAME:-user}
-      #   USERPASS: ${USERPASS:-1234}
-      #   ROOTPASS: ${ROOTPASS:-1234}
-      #   PACKAGES: ${PACKAGES:-}
-      #   GIT_EMAIL: ${GIT_EMAIL:-}
-      #   GIT_NAME: ${GIT_NAME:-}
-    # environment:
-    #   - LANG=en_US.UTF-8
-    #   - LANGUAGE=en_US:en
-    #   - LC_ALL=en_US.UTF-8
-    #   - DEBIAN_FRONTEND=noninteractive
-    #   - DISPLAY=${DISPLAY}
-    #   - TERM=xterm
+      target: packed
+    depends_on:
+      wordpress:
+        condition: service_healthy
+    ports:
+      - 443:443
     networks:
       net_00:
         ipv4_address: "12.0.0.10"
+    volumes:
+      - nginx_root:/var/www/html
+
+  wordpress:
+    container_name: wordpress
+    build:
+      context: "./wordpress"
+    depends_on:
+      - mariadb
+    ports:
+      - 9000:9000
+    networks:
+      net_00:
+        ipv4_address: "12.0.0.11"
+    volumes:
+      - wordpress_root:/var/www/html
 
   mariadb:
     container_name: mariadb
     build:
       context: "./mariadb"
-      target: "base"
-      # args  :
-      #   USERNAME: ${USERNAME:-user}
-      #   USERPASS: ${USERPASS:-1234}
-      #   ROOTPASS: ${ROOTPASS:-1234}
-      #   PACKAGES: ${PACKAGES:-}
-      #   GIT_EMAIL: ${GIT_EMAIL:-}
-      #   GIT_NAME: ${GIT_NAME:-}
-    # environment:
-    #   - LANG=en_US.UTF-8
-    #   - LANGUAGE=en_US:en
-    #   - LC_ALL=en_US.UTF-8
-    #   - DEBIAN_FRONTEND=noninteractive
-    #   - DISPLAY=${DISPLAY}
-    #   - TERM=xterm
+      target: "packed"
+    ports:
+      - 3306:3306
     networks:
       net_00:
-        ipv4_address: "12.0.0.11"
+        ipv4_address: "12.0.0.12"
     volumes:
-    - maria_db:/var/lib/mysql
+      - maria_db:/var/www/html
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 10s
+      retries: 6
 
 networks:
   net_00:
@@ -63,9 +64,24 @@ networks:
           gateway: 12.0.0.1
 
 volumes:
+
   maria_db:
     driver: local
     driver_opts:
-      type: 'none'
-      o: 'bind'
-      device: /home/kali/data
+      type: "none"
+      o: "bind"
+      device: ${HOME}/data/mariadb
+
+  nginx_root:
+    driver: local
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: ${HOME}/data/nginx
+
+  wordpress_root:
+    driver: local
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: ${HOME}/data/wordpress

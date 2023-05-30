@@ -1,27 +1,39 @@
-SHARE_DIR			:= /home/kali/data
+SHARE_BASE			:= ${HOME}/data
+
+SHARE_DIR			:= $(SHARE_BASE)/nginx		\
+					   $(SHARE_BASE)/mariab		\
+					   $(SHARE_BASE)/wordpress
 
 DOCKER_COMPOSE		:= docker compose -f ./srcs/docker-compose.yaml
 
-COMPOSE_TARGET		:= mariadb
+ifeq ($(COMPOSE_TARGET),)
+COMPOSE_TARGET		:= nginx
+endif
 
 RE_STR				:=
+
+SHELL				:= /bin/bash
+
+MKDIR				= \
+$(shell [ -f $(1) ] && rm -f $(1)) \
+$(shell [ ! -d $(1) ] && mkdir -p $(1))
 
 ifeq ($(findstring re,$(MAKECMDGOALS)),re)
 RE_STR				:= --no-cache
 endif
 
-.PHONY:				run re build $(SHARE_DIR)
-
-run:				build
-	$(DOCKER_COMPOSE) run -it $(COMPOSE_TARGET)
+.PHONY:				re up build $(SHARE_DIR)
 
 up:					build
-	$(DOCKER_COMPOSE) up $(COMPOSE_TARGET)
+	$(DOCKER_COMPOSE) up
 
 build:				$(SHARE_DIR)
-	$(DOCKER_COMPOSE) build $(COMPOSE_TARGET) $(RE_STR)
+	$(DOCKER_COMPOSE) build $(RE_STR)
 
-re:					run
+kill:
+	$(DOCKER_COMPOSE) kill
+
+re:					up
 
 $(SHARE_DIR):
-	$(shell [ -d $(SHARE_DIR) ] || mkdir -p $(SHARE_DIR))
+	$(call MKDIR,$(@))

@@ -1,0 +1,2 @@
+# .env file never push this file, never.
+srcs/.env
