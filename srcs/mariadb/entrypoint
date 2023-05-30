@@ -1,29 +1,33 @@
 #!/bin/ash
 
-MYSQL_OPT="--user=mysql --verbose=0"
+MYSQL_OPT="--user=mysql --verbose=0 --skip-name-resolve --skip-networking=0"
 
-if [ ! -d "/run/mysqld" ]; then
+if [ ! -d /run/mysqld ]; then
 	mkdir -p /run/mysqld
-	chown -R mysql:mysql /run/mysqld
 fi
+
+chown -R mysql:mysql /run/mysqld
 
 if [ ! -d /var/lib/mysql/mysql ]; then
 	chown -R mysql:mysql /var/lib/mysql
 
-	mysql_install_db --user="mysql" --basedir=/usr --datadir=/var/lib/mysql --rpm >/dev/null
+	mysql_install_db --user="mysql" --ldata=/var/lib/mysql >/dev/null
 
-	/usr/bin/mysqld ${MYSQL_OPT} --console $!
-	tmp_mysqld="${!}"
+	tmp_file=$(mktemp)
 
-	mysql -e "CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\` CHARACTER SET utf8 COLLATE utf8_general_ci;"
-	mysql -e "USE ${DB_NAME};"
-	mysql -e "CREATE USER 'root'@'%' IDENTIFIED BY '${ADMIN_PASS}';"
-	mysql -e "GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO 'root'@'%';"
-	mysql -e "DROP DATABASE IF EXISTS test ;"
-	mysql -e "FLUSH PRIVILEGES ;"
+	cat << EOSQL > ${tmp_file}
+CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\` CHARACTER SET utf8 COLLATE utf8_general_ci ;
+USE ${DB_NAME};
+FLUSH PRIVILEGES ;
+GRANT ALL ON *.* TO 'root'@'%' identified by '${ADMIN_PASS}' WITH GRANT OPTION ;
+SET PASSWORD FOR 'root'@'%'=PASSWORD('${ADMIN_PASS}') ;
+DROP DATABASE IF EXISTS test ;
+FLUSH PRIVILEGES ;
+EOSQL
 
-	kill ${tmp_mysqld}
-	wait ${tmp_mysqld}
+	/usr/bin/mysqld --bootstrap ${MYSQL_OPT} < ${tmp_file}
+	rm ${tmp_file}
 fi
 
-exec /usr/bin/mysqld ${MYSQL_OPT} --console
+exec /usr/bin/mysqld --console ${MYSQL_OPT}
+

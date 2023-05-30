@@ -7,15 +7,9 @@ RUN			apk add --update									\
 
 FROM		base			AS packed
 
-RUN			openssl req											\
-				-x509											\
-				-nodes											\
-				-days 365										\
-				-subj "/C=FR/ST=France/L=Angou/O=420verfl0w/OU=420verfl0w"	\
-				-newkey rsa:2048								\
-				-keyout /etc/ssl/private/nginx-selfsigned.key	\
-				-out /etc/ssl/certs/nginx-selfsigned.crt
-
+COPY		--chown=root:root nginx-selfsigned.key /etc/ssl/private/
+COPY		--chown=root:root nginx-selfsigned.crt /etc/ssl/certs/
 COPY		--chown=root:root nginx.conf /etc/nginx/nginx.conf
+
 ENTRYPOINT	[ "nginx" ]
 CMD			[ "-g", "daemon off;" ]

@@ -9,8 +9,7 @@ wp config create \
 	--dbuser=root \
 	--dbpass=${ADMIN_PASS} \
 	--dbhost=mariadb \
-	--allow-root \
-	--extra-php
+	--allow-root
 
 wp core install \
 	--url=https://brda-sil.42.fr \
@@ -26,4 +25,7 @@ wp user create ${NORMAL_USER} \
 	--role=subscriber \
 	--allow-root
 
-php -F -R
+# php -F -R
+while [ 1 ]; do
+	sleep 5
+done
