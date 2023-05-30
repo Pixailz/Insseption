@@ -1,6 +1,7 @@
 FROM		alpine:3.17		AS base
 
 RUN			apk add --update		\
+				mariadb-client		\
 				mariadb && \
 			rm -f /var/cache/apk/*
 
