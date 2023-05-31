@@ -1,7 +1,8 @@
 version: "3.9"
 
 services:
-
+  ##############################################################################
+  # NGINX
   nginx:
     container_name: nginx
     build:
@@ -13,12 +14,16 @@ services:
     ports:
       - 443:443
     networks:
-      net_00:
+      main_net:
         ipv4_address: "12.0.0.10"
     volumes:
       - www_root:/var/www/html
       - log_nginx:/var/log/nginx
+  #
+  ##############################################################################
 
+  ##############################################################################
+  # WORDPRESS
   wordpress:
     container_name: wordpress
     build:
@@ -36,7 +41,7 @@ services:
     ports:
       - 9000:9000
     networks:
-      net_00:
+      main_net:
         ipv4_address: "12.0.0.11"
     volumes:
       - www_root:/var/www/html
@@ -46,7 +51,11 @@ services:
       interval: 2s
       timeout: 1s
       retries: 10
+  #
+  ##############################################################################
 
+  ##############################################################################
+  # MARIADB
   mariadb:
     container_name: mariadb
     build:
@@ -60,7 +69,7 @@ services:
     ports:
       - 3306:3306
     networks:
-      net_00:
+      main_net:
         ipv4_address: "12.0.0.12"
     volumes:
       - maria_db:/var/lib/mysql
@@ -70,36 +79,78 @@ services:
       interval: 2s
       timeout: 1s
       retries: 10
+  #
+  ##############################################################################
+
+  ##############################################################################
+  # VSFTPD
+  vsftpd:
+    container_name: vsftpd
+    build:
+      context: "./vsftpd"
+      target: "packed"
+    # environment:
+    #   - ADMIN_PASS=${ADMIN_PASS}
+    #   - NORMAL_USER=${NORMAL_USER}
+    #   - NORMAL_PASS=${NORMAL_PASS}
+    #   - DB_NAME=${DB_NAME}
+    ports:
+      - 3306:3306
+    networks:
+      main_net:
+        ipv4_address: "12.0.0.13"
+    volumes:
+      - www_root:/home/vsftpd
+    healthcheck:
+      test: [ "CMD", "pgrep", "vsftpd" ]
+      interval: 2s
+      timeout: 1s
+      retries: 10
+  #
+  ##############################################################################
 
 networks:
-  net_00:
-    name: net_00
+  ##############################################################################
+  # MAIN INTERNAL NETWORK
+  main_net:
+    name: main_net
     driver: bridge
     driver_opts:
-      com.docker.network.bridge.name: net_00
+      com.docker.network.bridge.name: main_net
     ipam:
       driver: default
       config:
         - subnet: 13.37.42.0/24
           ip_range: 13.37.42.0/24
           gateway: 13.37.42.1
+  #
+  ##############################################################################
 
 volumes:
-
+  ##############################################################################
+  # MARIA DB VOLUMES
   maria_db:
     driver: local
     driver_opts:
       type: "none"
       o: "bind"
       device: ${HOME}/data/mariadb
+  #
+  ##############################################################################
 
+  ##############################################################################
+  # NGINX / WORDPRESS VOLUMES
   www_root:
     driver: local
     driver_opts:
       type: "none"
       o: "bind"
       device: ${HOME}/data/www_root
+  #
+  ##############################################################################
 
+  ##############################################################################
+  # SOME LOGS VOLUMES
   log_mariadb:
     driver: local
     driver_opts:
@@ -120,3 +171,5 @@ volumes:
       type: "none"
       o: "bind"
       device: ${HOME}/data/log/wordpress
+  #
+  ##############################################################################
