@@ -34,11 +34,14 @@ build:				$(SHARE_DIR)
 kill:
 	$(DOCKER_COMPOSE) kill $(TARGET)
 
+exec:
+	$(DOCKER_COMPOSE) exec -it $(TARGET) ash
+
 re:					up
 
 fclean:				kill
-# docker system prune -af
-# docker volume rm $(shell docker volume ls -q) ; true
+	# docker system prune -af
+	# docker volume rm $(shell docker volume ls -q) ; 	true
 	sudo rm -rf $(SHARE_BASE)
 
 $(SHARE_DIR):

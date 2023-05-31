@@ -1,9 +1,11 @@
 FROM		alpine:3.17		AS base
 
-RUN			apk add --update		\
-				mariadb-client		\
-				mariadb && \
-			rm -f /var/cache/apk/*
+RUN			apk add --update				\
+				mariadb 					\
+				# DEBUG ONLY
+				# netcat-openbsd				\
+				# iputils \
+			&& rm -f /var/cache/apk/*
 
 FROM		base			AS packed
 

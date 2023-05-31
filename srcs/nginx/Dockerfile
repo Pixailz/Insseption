@@ -1,15 +1,26 @@
 FROM		alpine:3.17		AS base
 
-RUN			apk add --update									\
-				nginx											\
-				openssl && \
-			rm -f /var/cache/apk/*
+RUN			apk add --update				\
+				nginx						\
+				openssl						\
+				# DEBUG ONLY
+				# netcat-openbsd				\
+				# iputils \
+			&& rm -f /var/cache/apk/*
 
 FROM		base			AS packed
 
-COPY		--chown=root:root nginx-selfsigned.key /etc/ssl/private/
-COPY		--chown=root:root nginx-selfsigned.crt /etc/ssl/certs/
-COPY		--chown=root:root nginx.conf /etc/nginx/nginx.conf
+RUN			openssl req											\
+				-x509											\
+				-newkey rsa:4096								\
+				-sha256											\
+				-nodes											\
+				-days 365										\
+				-subj "/C=FR/ST=Angou/L=Angou/O=420verfl0w/OU=420/CN=420overfl0w/"	\
+				-keyout /etc/ssl/private/nginx-selfsigned.key	\
+				-out /etc/ssl/certs/nginx-selfsigned.crt
+
+COPY		--chown=nginx:nginx nginx.conf /etc/nginx/nginx.conf
 
 ENTRYPOINT	[ "nginx" ]
 CMD			[ "-g", "daemon off;" ]

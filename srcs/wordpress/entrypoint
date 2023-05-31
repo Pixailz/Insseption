@@ -1,6 +1,8 @@
 #!/bin/ash
 
-cd /var/www/html
+mkdir /var/www/html/wordpress
+
+cd /var/www/html/wordpress
 
 wp core download --allow-root
 
@@ -9,7 +11,8 @@ wp config create \
 	--dbuser=root \
 	--dbpass=${ADMIN_PASS} \
 	--dbhost=mariadb \
-	--allow-root
+	--allow-root \
+	--extra-php
 
 wp core install \
 	--url=https://brda-sil.42.fr \
@@ -25,7 +28,9 @@ wp user create ${NORMAL_USER} \
 	--role=subscriber \
 	--allow-root
 
-# php -F -R
-while [ 1 ]; do
-	sleep 5
-done
+# wp theme install twentyseventeen --allow-root
+# wp theme activate twentyseventeen --allow-root
+
+printf "Launching wordpress on port :9000\n"
+
+/usr/sbin/php-fpm81 -F -R
