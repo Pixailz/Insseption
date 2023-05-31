@@ -19,3 +19,5 @@ endif
 
 RE_STR				?=
 TARGET				?=
+
+ENV_FILE			:= srcs/.env

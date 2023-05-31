@@ -10,7 +10,7 @@ chown -R mysql:mysql /run/mysqld
 
 if [ ! -d /var/lib/mysql/mysql ]; then
 
-	printf "MariaDB \x1b[38:2::255:0:0mnot found\x1b[00m, initialize it\n"
+	printf "MariaDB \x1b[38:5:160mnot found\x1b[00m, initialize it\n"
 
 	chown -R mysql:mysql /var/lib/mysql
 
@@ -18,7 +18,7 @@ if [ ! -d /var/lib/mysql/mysql ]; then
 
 	tmp_file=$(mktemp)
 
-	cat << EOSQL > ${tmp_file}
+	cat << EOSQL > "${tmp_file}"
 CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\` CHARACTER SET utf8 COLLATE utf8_general_ci ;
 USE ${DB_NAME};
 FLUSH PRIVILEGES ;
@@ -28,11 +28,12 @@ DROP DATABASE IF EXISTS test ;
 FLUSH PRIVILEGES ;
 EOSQL
 
-	/usr/bin/mysqld --bootstrap ${MYSQL_OPT} < ${tmp_file}
-	rm ${tmp_file}
+	/usr/bin/mysqld --bootstrap ${MYSQL_OPT} < "${tmp_file}"
+	rm "${tmp_file}"
 else
-	printf "MariaDB \x1b[38:2::0:255:0mfound\x1b[00m, Skiping initialization\n"
+	printf "MariaDB \x1b[38:5:76mfound\x1b[00m, Skiping initialization\n"
 fi
 
-exec /usr/bin/mysqld --console ${MYSQL_OPT}
+printf "MariaDB launched on port: \x1b[38:5:208m3306\x1b[00m\n"
 
+exec /usr/bin/mysqld --console ${MYSQL_OPT}

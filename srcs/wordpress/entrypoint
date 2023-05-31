@@ -2,39 +2,43 @@
 
 if [ ! -d /var/www/html/wordpress ]; then
 
-	printf "WordPress \x1b[38:2::255:0:0mnot found\x1b[00m, initialize it\n"
+	printf "WordPress \x1b[38:5:160mnot found\x1b[00m, initialize it\n"
 
 	cd /var/www/html/
 
 	wget https://wordpress.org/wordpress-6.2.2.tar.gz
 	tar xf wordpress-6.2.2.tar.gz && rm -rf wordpress-6.2.2.tar.gz
-	cd wordpress
+
+	if [ "${WP_ROOT}" != "wordpress" ]; then
+		mv wordpress "${WP_ROOT}"
+	fi
+	cd "${WP_ROOT}"
 
 	wp config create \
-		--dbname=${DB_NAME} \
-		--dbuser=${ADMIN_USER} \
-		--dbpass=${ADMIN_PASS} \
+		--dbname="${DB_NAME}" \
+		--dbuser="${ADMIN_USER}" \
+		--dbpass="${ADMIN_PASS}" \
 		--dbhost=mariadb \
 
 	wp core install \
-		--url=https://brda-sil.42.fr/wordpress \
+		"--url=https://brda-sil.42.fr/${WP_ROOT}" \
 		--title="${WP_TITLE}" \
-		--admin_user=${ADMIN_USER} \
-		--admin_password=${ADMIN_PASS} \
+		--admin_user="${ADMIN_USER}" \
+		--admin_password="${ADMIN_PASS}" \
 		--admin_email="${ADMIN_USER}@nowhere.com" \
 		--skip-email
 
-	wp user create ${NORMAL_USER} ${NORMAL_USER}@nowhere.com \
-		--user_pass=${NORMAL_PASS} \
+	wp user create "${NORMAL_USER}" "${NORMAL_USER}@nowhere.com" \
+		--user_pass="${NORMAL_PASS}" \
 		--role=contributor
 
 	wp theme activate twentytwentytwo
 
 	cd - >/dev/null
 else
-	printf "WordPress \x1b[38:2::0:255:0mfound\x1b[00m, Skiping initialization\n"
+	printf "WordPress \x1b[38:5:76mfound\x1b[00m, Skiping initialization\n"
 fi
 
-printf "launching WordPress on port: \x1b[38:2::255:128:0m9000\x1b[00m\n"
+printf "WordPress launched on port: \x1b[38:5:208m9000\x1b[00m\n"
 
 php-fpm81 -F -R

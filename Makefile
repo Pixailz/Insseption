@@ -1,6 +1,6 @@
 include ./config.mk
 
-.PHONY:				re up build $(SHARE_DIR)
+.PHONY:				up run build kill exec re clean fclean $(SHARE_DIR)
 
 up:					build
 	$(DOCKER_COMPOSE) up $(TARGET)
@@ -8,8 +8,7 @@ up:					build
 run:				build
 	$(DOCKER_COMPOSE) run -it $(TARGET)
 
-build:				$(SHARE_DIR)
-	@printf "Building target: %s\n" $(TARGET)
+build:				$(SHARE_DIR) $(ENV_FILE)
 	$(DOCKER_COMPOSE) build $(TARGET) $(RE_STR)
 
 kill:
@@ -26,6 +25,9 @@ clean:
 fclean:				kill clean
 	docker system prune -af
 	docker volume rm $(shell docker volume ls -q) ; 	true
+
+$(ENV_FILE):
+	cp ./srcs/.env{.template,}
 
 $(SHARE_DIR):
 	$(call MKDIR,$(@))

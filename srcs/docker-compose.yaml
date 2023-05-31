@@ -1,58 +1,6 @@
 version: "3.9"
 
 services:
-  ##############################################################################
-  # NGINX
-  nginx:
-    container_name: nginx
-    build:
-      context: "./nginx"
-      target: packed
-    depends_on:
-      wordpress:
-        condition: service_healthy
-    ports:
-      - 443:443
-    networks:
-      main_net:
-        ipv4_address: "12.0.0.10"
-    volumes:
-      - www_root:/var/www/html
-      - log_nginx:/var/log/nginx
-  #
-  ##############################################################################
-
-  ##############################################################################
-  # WORDPRESS
-  wordpress:
-    container_name: wordpress
-    build:
-      context: "./wordpress"
-    environment:
-      - ADMIN_USER=${ADMIN_USER}
-      - ADMIN_PASS=${ADMIN_PASS}
-      - NORMAL_USER=${NORMAL_USER}
-      - NORMAL_PASS=${NORMAL_PASS}
-      - DB_NAME=${DB_NAME}
-      - WP_TITLE=${WP_TITLE}
-    depends_on:
-      mariadb:
-        condition: service_healthy
-    ports:
-      - 9000:9000
-    networks:
-      main_net:
-        ipv4_address: "12.0.0.11"
-    volumes:
-      - www_root:/var/www/html
-      - log_wordpress:/var/log/php81
-    healthcheck:
-      test: [ "CMD", "pgrep", "php81" ]
-      interval: 2s
-      timeout: 1s
-      retries: 10
-  #
-  ##############################################################################
 
   ##############################################################################
   # MARIADB
@@ -70,7 +18,7 @@ services:
       - 3306:3306
     networks:
       main_net:
-        ipv4_address: "12.0.0.12"
+        ipv4_address: "13.37.42.12"
     volumes:
       - maria_db:/var/lib/mysql
       - log_mariadb:/var/log/mariadb
@@ -83,29 +31,86 @@ services:
   ##############################################################################
 
   ##############################################################################
+  # WORDPRESS
+  wordpress:
+    container_name: wordpress
+    build:
+      context: "./wordpress"
+    environment:
+      - ADMIN_USER=${ADMIN_USER}
+      - ADMIN_PASS=${ADMIN_PASS}
+      - NORMAL_USER=${NORMAL_USER}
+      - NORMAL_PASS=${NORMAL_PASS}
+      - DB_NAME=${DB_NAME}
+      - WP_TITLE=${WP_TITLE}
+      - WP_ROOT=${WP_ROOT}
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    ports:
+      - 9000:9000
+    networks:
+      main_net:
+        ipv4_address: "13.37.42.11"
+    volumes:
+      - www_root:/var/www/html
+      - log_wordpress:/var/log/php81
+    healthcheck:
+      test: [ "CMD", "pgrep", "php81" ]
+      interval: 2s
+      timeout: 1s
+      retries: 10
+  #
+  ##############################################################################
+
+  ##############################################################################
+  # NGINX
+  nginx:
+    container_name: nginx
+    build:
+      context: "./nginx"
+      target: packed
+    depends_on:
+      wordpress:
+        condition: service_healthy
+    ports:
+      - 443:443
+    networks:
+      main_net:
+        ipv4_address: "13.37.42.10"
+    volumes:
+      - www_root:/var/www/html
+      - log_nginx:/var/log/nginx
+  #
+  ##############################################################################
+
+  ##############################################################################
   # VSFTPD
   vsftpd:
     container_name: vsftpd
     build:
       context: "./vsftpd"
       target: "packed"
+    depends_on:
+      wordpress:
+        condition: service_healthy
     # environment:
     #   - ADMIN_PASS=${ADMIN_PASS}
     #   - NORMAL_USER=${NORMAL_USER}
     #   - NORMAL_PASS=${NORMAL_PASS}
     #   - DB_NAME=${DB_NAME}
-    ports:
-      - 3306:3306
+    # ports:
+    #   - 3306:3306
     networks:
       main_net:
-        ipv4_address: "12.0.0.13"
+        ipv4_address: "13.37.42.13"
     volumes:
       - www_root:/home/vsftpd
-    healthcheck:
-      test: [ "CMD", "pgrep", "vsftpd" ]
-      interval: 2s
-      timeout: 1s
-      retries: 10
+    # healthcheck:
+    #   test: [ "CMD", "pgrep", "vsftpd" ]
+    #   interval: 2s
+    #   timeout: 1s
+    #   retries: 10
   #
   ##############################################################################
 
@@ -120,8 +125,8 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: 13.37.42.0/24
-          ip_range: 13.37.42.0/24
+        - subnet: 13.37.42.0/25
+          ip_range: 13.37.42.0/25
           gateway: 13.37.42.1
   #
   ##############################################################################

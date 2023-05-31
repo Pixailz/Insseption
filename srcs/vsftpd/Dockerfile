@@ -17,4 +17,4 @@ RUN			openssl req											\
 				-keyout /etc/vsftpd/vsftpd.key	\
 				-out /etc/vsftpd/vsftpd.crt
 
-ENTRYPOINT	[ "/run/entrypoint" ]
+# ENTRYPOINT	[ "/run/entrypoint" ]
