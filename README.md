@@ -1,4 +1,5 @@
 # Insseption
 
 ## TODO
-- link .env to all Dockerfile
+
+- all the bonuses and more
