@@ -1,36 +1,40 @@
 #!/bin/ash
 
-mkdir /var/www/html/wordpress
+if [ ! -d /var/www/html/wordpress ]; then
 
-cd /var/www/html/wordpress
+	printf "WordPress \x1b[38:2::255:0:0mnot found\x1b[00m, initialize it\n"
 
-wp core download --allow-root
+	cd /var/www/html/
 
-wp config create \
-	--dbname=${DB_NAME} \
-	--dbuser=root \
-	--dbpass=${ADMIN_PASS} \
-	--dbhost=mariadb \
-	--allow-root \
-	--extra-php
+	wget https://wordpress.org/wordpress-6.2.2.tar.gz
+	tar xf wordpress-6.2.2.tar.gz && rm -rf wordpress-6.2.2.tar.gz
+	cd wordpress
 
-wp core install \
-	--url=https://brda-sil.42.fr \
-	--title="Mine Site" \
-	--admin_user=${ADMIN_USER} \
-	--admin_password=${ADMIN_PASS} \
-	--admin_email="pix@nowhere.com" \
-	--allow-root
+	wp config create \
+		--dbname=${DB_NAME} \
+		--dbuser=${ADMIN_USER} \
+		--dbpass=${ADMIN_PASS} \
+		--dbhost=mariadb \
 
-wp user create ${NORMAL_USER} \
-	brda-sil@nowhere.com \
-	--user_pass=${NORMAL_PASS} \
-	--role=subscriber \
-	--allow-root
+	wp core install \
+		--url=https://brda-sil.42.fr/wordpress \
+		--title="${WP_TITLE}" \
+		--admin_user=${ADMIN_USER} \
+		--admin_password=${ADMIN_PASS} \
+		--admin_email="${ADMIN_USER}@nowhere.com" \
+		--skip-email
 
-# wp theme install twentyseventeen --allow-root
-# wp theme activate twentyseventeen --allow-root
+	wp user create ${NORMAL_USER} ${NORMAL_USER}@nowhere.com \
+		--user_pass=${NORMAL_PASS} \
+		--role=contributor
 
-printf "Launching wordpress on port :9000\n"
+	wp theme activate twentytwentytwo
 
-/usr/sbin/php-fpm81 -F -R
+	cd - >/dev/null
+else
+	printf "WordPress \x1b[38:2::0:255:0mfound\x1b[00m, Skiping initialization\n"
+fi
+
+printf "launching WordPress on port: \x1b[38:2::255:128:0m9000\x1b[00m\n"
+
+php-fpm81 -F -R

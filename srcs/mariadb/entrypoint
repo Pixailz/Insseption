@@ -9,6 +9,9 @@ fi
 chown -R mysql:mysql /run/mysqld
 
 if [ ! -d /var/lib/mysql/mysql ]; then
+
+	printf "MariaDB \x1b[38:2::255:0:0mnot found\x1b[00m, initialize it\n"
+
 	chown -R mysql:mysql /var/lib/mysql
 
 	mysql_install_db --user="mysql" --ldata=/var/lib/mysql >/dev/null
@@ -19,14 +22,16 @@ if [ ! -d /var/lib/mysql/mysql ]; then
 CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\` CHARACTER SET utf8 COLLATE utf8_general_ci ;
 USE ${DB_NAME};
 FLUSH PRIVILEGES ;
-GRANT ALL ON ${DB_NAME}.* TO 'root'@'%' identified by '${ADMIN_PASS}' WITH GRANT OPTION ;
-SET PASSWORD FOR 'root'@'%'=PASSWORD('${ADMIN_PASS}') ;
+GRANT ALL ON ${DB_NAME}.* TO '${ADMIN_USER}'@'%' identified by '${ADMIN_PASS}' WITH GRANT OPTION ;
+SET PASSWORD FOR '${ADMIN_USER}'@'%'=PASSWORD('${ADMIN_PASS}') ;
 DROP DATABASE IF EXISTS test ;
 FLUSH PRIVILEGES ;
 EOSQL
 
 	/usr/bin/mysqld --bootstrap ${MYSQL_OPT} < ${tmp_file}
 	rm ${tmp_file}
+else
+	printf "MariaDB \x1b[38:2::0:255:0mfound\x1b[00m, Skiping initialization\n"
 fi
 
 exec /usr/bin/mysqld --console ${MYSQL_OPT}
