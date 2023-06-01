@@ -124,9 +124,14 @@ services:
     build:
       context: "./static_site"
       target: "packed"
+    environment:
+      - DEBUG=${DEBUG:-0}
     depends_on:
       nginx:
         condition: service_healthy
+    networks:
+      main_net:
+        ipv4_address: "13.37.42.16"
     volumes:
       - www_root:/var/www/html
     # healthcheck:
@@ -145,9 +150,6 @@ services:
       args:
         FTP_USER: ${ADMIN_USER}
         FTP_PASS: ${ADMIN_PASS}
-    depends_on:
-      nginx:
-        condition: service_healthy
     environment:
       - FTP_USER=${ADMIN_USER}
       - FTP_PASS=${ADMIN_PASS}
@@ -156,8 +158,10 @@ services:
       - FTP_PASV_MIN_PORT=${FTP_PASV_MIN_PORT:-10000}
       - FTP_PASV_MAX_PORT=${FTP_PASV_MAX_PORT:-10100}
       - DEBUG=${DEBUG:-0}
+    depends_on:
+      nginx:
+        condition: service_healthy
     ports:
-      - 990:990
       - ${FTP_PORT:-21}:${FTP_PORT:-21}
       - ${FTP_DATA_PORT:-20}:${FTP_DATA_PORT:-20}
       - ${FTP_PASV_MIN_PORT:-10000}-${FTP_PASV_MAX_PORT:-10100}:${FTP_PASV_MIN_PORT:-10000}-${FTP_PASV_MAX_PORT:-10100}
@@ -169,6 +173,31 @@ services:
       - vsftpd_conf:/etc/vsftpd
     # healthcheck:
     #   test: [ "CMD", "pgrep", "vsftpd" ]
+    #   << : *healthcheck_conf
+  #
+  ##############################################################################
+
+  ##############################################################################
+  # Adminer
+  adminer:
+    container_name: adminer
+    build:
+      context: "./adminer"
+      target: "packed"
+    environment:
+      - DEBUG=${DEBUG:-0}
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    ports:
+      - 80:80
+    volumes:
+      - www_root:/var/www/html
+    networks:
+      main_net:
+        ipv4_address: "13.37.42.17"
+    # healthcheck:
+    #   test: [ "CMD", "[", "-f", "/var/www/html/img", "]" ]
     #   << : *healthcheck_conf
   #
   ##############################################################################
