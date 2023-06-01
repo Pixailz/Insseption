@@ -7,6 +7,7 @@ RUN			apk add --update \
 				php-mysqli \
 			&& rm -f /var/cache/apk/*
 
+
 FROM		base			AS packed
 
 COPY		--chown=root:root entrypoint /run

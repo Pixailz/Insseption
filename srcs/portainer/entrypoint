@@ -1,0 +1,26 @@
+#!/bin/ash
+
+if [ "${DEBUG}" != "0" ]; then
+	printf "debuging \x1b[38:5:39mPortainer\x1b[00m \n\n"
+	printf "DEBUG         %s\n\n" "${DEBUG}"
+fi
+
+if [ ! -f /data/portainer/portainer ]; then
+	wget https://github.com/portainer/portainer/releases/download/2.18.3/portainer-2.18.3-linux-amd64.tar.gz \
+		-O latest.tar.gz
+	tar xvf latest.tar.gz && rm latest.tar.gz
+	mkdir -p /data
+	mv portainer /data/portainer
+	printf "${ADMIN_PASS}" > /data/admin_pass
+else
+	printf "Portainer \x1b[38:5:76mfound\x1b[00m, Skiping initialization\n"
+fi
+
+printf "Portainer launched on port: \x1b[38:5:208m9443\x1b[00m\n"
+
+cd /data/portainer/
+
+/data/portainer/portainer \
+	--no-analytics \
+	--http-disabled \
+	--admin-password-file=/data/admin_pass

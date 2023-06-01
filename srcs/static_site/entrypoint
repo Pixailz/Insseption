@@ -5,9 +5,10 @@ if [ "${DEBUG}" != "0" ]; then
 	printf "DEBUG         %s\n\n" "${DEBUG}"
 fi
 
-if [ ! -d /var/www/html/img ]; then
+if [ ! -f /static_done ]; then
 	cp -r /tmp/static_site/* /var/www/html/
 	rm -rf /tmp/static_site
+	touch /static_done
 else
 	printf "Static Site \x1b[38:5:76mfound\x1b[00m, Skiping initialization\n"
 fi

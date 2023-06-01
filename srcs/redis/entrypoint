@@ -5,7 +5,7 @@ if [ "${DEBUG}" != "0" ]; then
 	printf "DEBUG         %s\n\n" "${DEBUG}"
 fi
 
-if [ ! -d /etc/redis.conf.bak ]; then
+if [ ! -f /etc/redis.conf.bak ]; then
 	printf "Redis \x1b[38:5:160mnot found\x1b[00m, initialize it\n"
 
 	cp /etc/redis.conf /etc/redis.conf.bak

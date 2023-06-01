@@ -5,6 +5,7 @@ SHARE_DIR			:= mariadb \
 					   nginx \
 					   www_root \
 					   vsftpd \
+					   portainer \
 					   log/wordpress \
 					   log/nginx \
 					   log/mariadb

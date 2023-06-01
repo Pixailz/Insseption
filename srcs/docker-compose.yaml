@@ -111,9 +111,9 @@ services:
     networks:
       main_net:
         ipv4_address: "13.37.42.15"
-    # healthcheck:
-    #   test: [ "CMD", "pgrep", "redis" ]
-    #   << : *healthcheck_conf
+    healthcheck:
+      test: [ "CMD", "pgrep", "redis" ]
+      << : *healthcheck_conf
   #
   ##############################################################################
 
@@ -134,9 +134,9 @@ services:
         ipv4_address: "13.37.42.16"
     volumes:
       - www_root:/var/www/html
-    # healthcheck:
-    #   test: [ "CMD", "[", "-f", "/var/www/html/img", "]" ]
-    #   << : *healthcheck_conf
+    healthcheck:
+      test: [ "CMD", "[", "-f", "/var/www/html/img", "]" ]
+      << : *healthcheck_conf
   #
   ##############################################################################
 
@@ -171,9 +171,9 @@ services:
     volumes:
       - www_root:/home/${ADMIN_USER}
       - vsftpd_conf:/etc/vsftpd
-    # healthcheck:
-    #   test: [ "CMD", "pgrep", "vsftpd" ]
-    #   << : *healthcheck_conf
+    healthcheck:
+      test: [ "CMD", "pgrep", "vsftpd" ]
+      << : *healthcheck_conf
   #
   ##############################################################################
 
@@ -185,6 +185,7 @@ services:
       context: "./adminer"
       target: "packed"
     environment:
+      - ADMIN_PASS=${ADMIN_PASS}
       - DEBUG=${DEBUG:-0}
     depends_on:
       mariadb:
@@ -196,9 +197,33 @@ services:
     networks:
       main_net:
         ipv4_address: "13.37.42.17"
-    # healthcheck:
-    #   test: [ "CMD", "[", "-f", "/var/www/html/img", "]" ]
-    #   << : *healthcheck_conf
+    healthcheck:
+      test: [ "CMD", "pgrep", "php" ]
+      << : *healthcheck_conf
+  #
+  ##############################################################################
+
+  ##############################################################################
+  # Custom
+  portainer:
+    container_name: portainer
+    build:
+      context: "./portainer"
+      target: "packed"
+    environment:
+      - ADMIN_PASS=${ADMIN_PASS}
+      - DEBUG=${DEBUG:-0}
+    ports:
+      - 9443:9443
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    networks:
+      main_net:
+        ipv4_address: "13.37.42.18"
+    healthcheck:
+      test: [ "CMD", "pgrep", "portainer" ]
+      << : *healthcheck_conf
   #
   ##############################################################################
 
@@ -213,8 +238,8 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: 13.37.42.0/25
-          ip_range: 13.37.42.0/25
+        - subnet: 13.37.42.0/27
+          ip_range: 13.37.42.0/27
           gateway: 13.37.42.1
   #
   ##############################################################################
@@ -261,6 +286,17 @@ volumes:
       type: "none"
       o: "bind"
       device: ${HOME}/data/www_root
+  #
+  ##############################################################################
+
+  ##############################################################################
+  # cAdvisor build
+  portainer_data:
+    driver: local
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: ${HOME}/data/portainer
   #
   ##############################################################################
 
