@@ -6,7 +6,7 @@ version: "3.9"
 x-healthcheck_conf: &healthcheck_conf
       interval: 2s
       timeout: 1s
-      retries: 10
+      retries: 20
 
 ################################################################################
 
@@ -50,6 +50,7 @@ services:
       - WP_NORMAL_USER=${NORMAL_USER}
       - WP_NORMAL_PASS=${NORMAL_PASS}
       - DB_NAME=${DB_NAME}
+      - REDIS_PASS=${ADMIN_PASS}
       - DEBUG=${DEBUG:-0}
     depends_on:
       mariadb:
@@ -63,6 +64,7 @@ services:
     healthcheck:
       test: [ "CMD", "pgrep", "php81" ]
       << : *healthcheck_conf
+      start_period: 5s
   #
   ##############################################################################
 
@@ -90,6 +92,46 @@ services:
     healthcheck:
       test: [ "CMD", "pgrep", "nginx" ]
       << : *healthcheck_conf
+  #
+  ##############################################################################
+
+  ##############################################################################
+  # Redis
+  redis:
+    container_name: redis
+    build:
+      context: "./redis"
+      target: packed
+    environment:
+      - REDIS_PASS=${ADMIN_PASS}
+      - DEBUG=${DEBUG:-0}
+    depends_on:
+      wordpress:
+        condition: service_healthy
+    networks:
+      main_net:
+        ipv4_address: "13.37.42.15"
+    # healthcheck:
+    #   test: [ "CMD", "pgrep", "redis" ]
+    #   << : *healthcheck_conf
+  #
+  ##############################################################################
+
+  ##############################################################################
+  # Static Site
+  static_site:
+    container_name: static_site
+    build:
+      context: "./static_site"
+      target: "packed"
+    depends_on:
+      nginx:
+        condition: service_healthy
+    volumes:
+      - www_root:/var/www/html
+    # healthcheck:
+    #   test: [ "CMD", "[", "-f", "/var/www/html/img", "]" ]
+    #   << : *healthcheck_conf
   #
   ##############################################################################
 

@@ -1,0 +1,13 @@
+#!/bin/ash
+
+if [ "${DEBUG}" != "0" ]; then
+	printf "debuging \x1b[38:5:39mStatic Site\x1b[00m \n\n"
+	printf "DEBUG         %s\n\n" "${DEBUG}"
+fi
+
+if [ ! -d /var/www/html/img ]; then
+	cp -r /tmp/static_site/* /var/www/html/
+	rm -rf /tmp/static_site
+else
+	printf "Static Site \x1b[38:5:76mfound\x1b[00m, Skiping initialization\n"
+fi

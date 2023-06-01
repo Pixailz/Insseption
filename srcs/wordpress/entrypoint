@@ -9,6 +9,7 @@ if [ "${DEBUG}" != "0" ]; then
 	printf "WP_NORMAL_USER %s\n" "${WP_NORMAL_USER}"
 	printf "WP_NORMAL_PASS %s\n" "${WP_NORMAL_PASS}"
 	printf "DB_NAME        %s\n" "${DB_NAME}"
+	printf "REDIS_PASS     %s\n" "${REDIS_PWD}"
 	printf "DEBUG          %s\n\n" "${DEBUG}"
 fi
 
@@ -45,6 +46,23 @@ if [ ! -d /var/www/html/wordpress ]; then
 		--role=contributor
 
 	wp theme activate twentytwentytwo
+
+	# enable redis cache
+	sed -i "40i define( 'WP_REDIS_HOST', 'redis' );" wp-config.php
+	sed -i "41i define( 'WP_REDIS_PORT', 6379 );" wp-config.php
+	sed -i "42i define( 'WP_REDIS_PASSWORD', '${REDIS_PWD}' );" wp-config.php
+	sed -i "42i define( 'WP_REDIS_TIMEOUT', 1 );" wp-config.php
+	sed -i "43i define( 'WP_REDIS_READ_TIMEOUT', 1 );" wp-config.php
+	sed -i "44i define( 'WP_REDIS_DATABASE', 0 );\n" wp-config.php
+
+	redis-cli -h redis flushall
+
+	wp plugin install redis-cache
+
+	wp plugin delete $(wp plugin list --status=inactive --field=name)
+	wp theme delete $(wp theme list --status=inactive --field=name)
+
+	wp plugin update --all
 
 	cd - >/dev/null
 else

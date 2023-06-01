@@ -25,6 +25,7 @@ clean:
 	sudo rm -rf $(SHARE_BASE)
 
 fclean:				kill clean
+	docker system prune -af
 	docker stop $(shell docker ps -qa) 2>/dev/null; true
 	docker rm $(shell docker ps -qa) 2>/dev/null; true
 	docker rmi $(shell docker images -qa) 2>/dev/null; true

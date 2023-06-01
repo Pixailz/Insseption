@@ -1,12 +1,21 @@
 FROM		alpine:3.17		AS base
 
-RUN			apk add --update			\
-				php						\
-				php-fpm					\
-				php-mysqli				\
-				php-phar				\
-				php-iconv				\
-				mariadb-client			\
+RUN			apk add --update \
+				php \
+				php-curl \
+				php-dom \
+				php-exif \
+				php-fileinfo \
+				php-mbstring \
+				php-zip \
+				php-gd \
+				php-intl \
+				php-fpm \
+				php-mysqli \
+				php-phar \
+				redis \
+				imagemagick \
+				mariadb-client \
 			&& rm -f /var/cache/apk/*
 
 RUN			wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
