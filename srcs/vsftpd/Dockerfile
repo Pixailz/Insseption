@@ -1,20 +1,18 @@
 FROM		alpine:3.17		AS base
 
-RUN			apk add --update			\
-				openssl					\
-				vsftpd					\
+RUN			apk add --update \
+				openssl \
+				vsftpd \
 			&& rm -f /var/cache/apk/*
+
 
 FROM		base			AS packed
 
-RUN			openssl req											\
-				-x509											\
-				-newkey rsa:4096								\
-				-sha256											\
-				-nodes											\
-				-days 365										\
-				-subj "/C=FR/ST=Charen/L=Angou/O=420verfl0w/OU=Security/CN=420overfl0w"	\
-				-keyout /etc/vsftpd/vsftpd.key	\
-				-out /etc/vsftpd/vsftpd.crt
+ARG			FTP_USER \
+			FTP_PASS
 
-# ENTRYPOINT	[ "/run/entrypoint" ]
+RUN			adduser -h "/home/${FTP_USER}" -s /sbin/nologin ${FTP_USER} -D -H && \
+			printf "${FTP_USER}:${FTP_PASS}\n" | chpasswd 2>/dev/null
+
+COPY		--chown=root:root entrypoint /run
+ENTRYPOINT	[ "/run/entrypoint" ]

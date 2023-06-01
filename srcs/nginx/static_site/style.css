@@ -1,0 +1,48 @@
+@font-face {
+	font-family: 'abelregular';
+	src: url('fonts/abel-regular-webfont.eot');
+	src: url('fonts/abel-regular-webfont.eot?#iefix') format('embedded-opentype'),
+		url('fonts/abel-regular-webfont.woff2') format('woff2'),
+		url('fonts/abel-regular-webfont.woff') format('woff'),
+		url('fonts/abel-regular-webfont.ttf') format('truetype'),
+		url('fonts/abel-regular-webfont.svg#abelregular') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+@font-face{
+	font-family: 'ArchivoNarrow';
+	src: url('fonts/ArchivoNarrow-Regular.otf');
+	font-weight: normal;
+	font-style: normal;
+}
+
+#johnwick{
+	border: 2px #000000 solid;
+	box-shadow: 5px 5px 2px #000000;
+	float: right;
+}
+
+body{
+	background: url(img/background.jpg) fixed;
+	font-family: "abelregular";
+	font-size: 1.7em;
+	color: #D4AF37;
+}
+
+h2{
+	color: #000000;
+	font-family: "ArchivoNarrow";
+}
+
+a{
+	color: #FFDF00;
+}
+
+a:visited{
+	color:  #ffffff;
+}
+
+.center{
+	text-align: center;
+}

@@ -1,0 +1,27 @@
+#!/bin/ash
+
+if [ "${DEBUG}" != "0" ]; then
+	printf "debuging \x1b[38:5:39mNginx\x1b[00m \n\n"
+	printf "DEBUG         %s\n\n" "${DEBUG}"
+fi
+
+if [ ! -d /etc/nginx/ssl ]; then
+	printf "Nginx \x1b[38:5:160mnot found\x1b[00m, initialize it\n"
+
+	mkdir -p /etc/nginx/ssl
+	openssl req \
+		-x509 \
+		-newkey rsa:4096 \
+		-sha256 \
+		-nodes \
+		-days 365 \
+		-subj "/C=FR/ST=Charen/L=Angou/O=420verfl0w/OU=Security/CN=420overfl0w" \
+		-keyout /etc/nginx/ssl/nginx-selfsigned.key \
+		-out /etc/nginx/ssl/nginx-selfsigned.crt
+else
+	printf "Nginx \x1b[38:5:76mfound\x1b[00m, Skiping initialization\n"
+fi
+
+printf "Nginx launched on port: \x1b[38:5:208m443\x1b[00m\n"
+
+/usr/sbin/nginx -g "daemon off;"
