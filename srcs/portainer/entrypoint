@@ -2,25 +2,50 @@
 
 if [ "${DEBUG}" != "0" ]; then
 	printf "debuging \x1b[38:5:39mPortainer\x1b[00m \n\n"
-	printf "DEBUG         %s\n\n" "${DEBUG}"
+	printf "ADMIN_PASS %s\n" "${ADMIN_PASS}"
+	printf "CERT_SUBJ  %s\n" "${CERT_SUBJ}"
+	printf "DEBUG      %s\n\n" "${DEBUG}"
 fi
 
-if [ ! -f /data/portainer/portainer ]; then
+function	portainer_create_cert()
+{
+	mkdir -p /data/ssl
+	openssl req \
+		-x509 \
+		-newkey rsa:4096 \
+		-sha256 \
+		-nodes \
+		-days 365 \
+		-subj "${CERT_SUBJ}" \
+		-keyout /data/ssl/portainer-selfsigned.key \
+		-out /data/ssl/portainer-selfsigned.crt
+}
+
+function	portainer_configure()
+{
 	wget https://github.com/portainer/portainer/releases/download/2.18.3/portainer-2.18.3-linux-amd64.tar.gz \
 		-O latest.tar.gz
 	tar xvf latest.tar.gz && rm latest.tar.gz
-	mkdir -p /data
 	mv portainer /data/portainer
 	printf "${ADMIN_PASS}" > /data/admin_pass
+}
+
+if [ ! -f /data/portainer/portainer ]; then
+	printf "Portainer \x1b[38:5:160mnot found\x1b[00m, initialize it\n"
+
+	portainer_create_cert
+	portainer_configure
 else
 	printf "Portainer \x1b[38:5:76mfound\x1b[00m, Skiping initialization\n"
 fi
 
 printf "Portainer launched on port: \x1b[38:5:208m9443\x1b[00m\n"
 
-cd /data/portainer/
-
-/data/portainer/portainer \
+PATH=/data/portainer:${PATH} /data/portainer/portainer \
 	--no-analytics \
 	--http-disabled \
+	--tlsverify \
+	--tlscert="/data/ssl/portainer-selfsigned.crt" \
+	--tlskey="/data/ssl/portainer-selfsigned.key" \
+	-H unix:///var/run/docker.sock \
 	--admin-password-file=/data/admin_pass

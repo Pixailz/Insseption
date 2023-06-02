@@ -4,6 +4,8 @@ RUN			apk add --update \
 				redis \
 			&& rm -f /var/cache/apk/*
 
+#=#=#
+
 FROM		base			AS packed
 
 COPY		--chown=root:root entrypoint /run

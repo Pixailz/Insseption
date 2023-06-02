@@ -50,10 +50,13 @@ services:
       - WP_NORMAL_USER=${NORMAL_USER}
       - WP_NORMAL_PASS=${NORMAL_PASS}
       - DB_NAME=${DB_NAME}
+      - CERT_SUBJ=${CERT_SUBJ}
       - REDIS_PASS=${ADMIN_PASS}
       - DEBUG=${DEBUG:-0}
     depends_on:
       mariadb:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     networks:
       main_net:
@@ -76,6 +79,7 @@ services:
       context: "./nginx"
       target: packed
     environment:
+      - CERT_SUBJ=${CERT_SUBJ}
       - DEBUG=${DEBUG:-0}
     depends_on:
       wordpress:
@@ -105,9 +109,9 @@ services:
     environment:
       - REDIS_PASS=${ADMIN_PASS}
       - DEBUG=${DEBUG:-0}
-    depends_on:
-      wordpress:
-        condition: service_healthy
+    # depends_on:
+    #   wordpress:
+    #     condition: service_healthy
     networks:
       main_net:
         ipv4_address: "13.37.42.15"
@@ -134,9 +138,6 @@ services:
         ipv4_address: "13.37.42.16"
     volumes:
       - www_root:/var/www/html
-    healthcheck:
-      test: [ "CMD", "[", "-f", "/var/www/html/img", "]" ]
-      << : *healthcheck_conf
   #
   ##############################################################################
 
@@ -211,8 +212,12 @@ services:
       context: "./portainer"
       target: "packed"
     environment:
+      - CERT_SUBJ=${CERT_SUBJ}
       - ADMIN_PASS=${ADMIN_PASS}
       - DEBUG=${DEBUG:-0}
+    depends_on:
+      wordpress:
+        condition: service_healthy
     ports:
       - 9443:9443
     volumes:
@@ -246,7 +251,7 @@ networks:
 
 volumes:
   ##############################################################################
-  # MARIA DB
+  # MariaDB Database
   maria_db:
     driver: local
     driver_opts:
@@ -290,7 +295,7 @@ volumes:
   ##############################################################################
 
   ##############################################################################
-  # cAdvisor build
+  # Portainer build
   portainer_data:
     driver: local
     driver_opts:

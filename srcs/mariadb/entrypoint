@@ -10,23 +10,16 @@ fi
 
 MYSQL_OPT="--user=mysql --verbose=0 --skip-name-resolve --skip-networking=0"
 
-if [ ! -d /run/mysqld ]; then
-	mkdir -p /run/mysqld
-fi
-
-chown -R mysql:mysql /run/mysqld
-
-if [ ! -d /var/lib/mysql/mysql ]; then
-
-	printf "MariaDB \x1b[38:5:160mnot found\x1b[00m, initialize it\n"
-
+function	mysql_prepare()
+{
 	chown -R mysql:mysql /var/lib/mysql
 	chown -R mysql:mysql /var/log/mariadb
-
 	mysql_install_db --user="mysql" --ldata=/var/lib/mysql >/dev/null
+}
 
+function	mysql_configure()
+{
 	tmp_file=$(mktemp)
-
 	cat << EOFSQL > "${tmp_file}"
 CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\` CHARACTER SET utf8 COLLATE utf8_general_ci ;
 USE ${DB_NAME};
@@ -39,9 +32,24 @@ EOFSQL
 
 	mysqld --bootstrap ${MYSQL_OPT} < "${tmp_file}"
 	rm "${tmp_file}"
+}
+
+if [ ! -d /var/lib/mysql/mysql ]; then
+
+	printf "MariaDB \x1b[38:5:160mnot found\x1b[00m, initialize it\n"
+
+	mysql_prepare
+	mysql_configure
 else
 	printf "MariaDB \x1b[38:5:76mfound\x1b[00m, Skiping initialization\n"
 fi
+
+if [ ! -d /run/mysqld ]; then
+	mkdir -p /run/mysqld
+fi
+
+chown -R mysql:mysql /run/mysqld
+
 printf "MariaDB launched on port: \x1b[38:5:208m3306\x1b[00m\n"
 
 /usr/bin/mysqld --console ${MYSQL_OPT}

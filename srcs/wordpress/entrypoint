@@ -13,10 +13,8 @@ if [ "${DEBUG}" != "0" ]; then
 	printf "DEBUG          %s\n\n" "${DEBUG}"
 fi
 
-if [ ! -d /var/www/html/wordpress ]; then
-
-	printf "WordPress \x1b[38:5:160mnot found\x1b[00m, initialize it\n"
-
+function	wp_download()
+{
 	cd /var/www/html/
 
 	wget https://wordpress.org/latest.tar.gz -O latest.tar.gz
@@ -26,7 +24,10 @@ if [ ! -d /var/www/html/wordpress ]; then
 		mv wordpress "${WP_ROOT}"
 	fi
 	cd "${WP_ROOT}"
+}
 
+function	wp_configure()
+{
 	wp config create \
 		--dbname="${DB_NAME}" \
 		--dbuser="${WP_ADMIN_USER}" \
@@ -46,7 +47,10 @@ if [ ! -d /var/www/html/wordpress ]; then
 		--role=contributor
 
 	wp theme activate twentytwentytwo
+}
 
+function	wp_configure_redis()
+{
 	# enable redis cache
 	sed -i "40i define( 'WP_REDIS_HOST', 'redis' );" wp-config.php
 	sed -i "41i define( 'WP_REDIS_PORT', 6379 );" wp-config.php
@@ -57,14 +61,23 @@ if [ ! -d /var/www/html/wordpress ]; then
 
 	redis-cli -h redis flushall
 
-	wp plugin install redis-cache
+	wp plugin install redis-cache --activate
+}
 
+function	wp_hardening()
+{
 	wp plugin delete $(wp plugin list --status=inactive --field=name)
 	wp theme delete $(wp theme list --status=inactive --field=name)
-
 	wp plugin update --all
+}
 
-	cd - >/dev/null
+if [ ! -d /var/www/html/wordpress ]; then
+	printf "WordPress \x1b[38:5:160mnot found\x1b[00m, initialize it\n"
+
+	wp_download
+	wp_configure
+	wp_configure_redis
+	wp_hardening
 else
 	printf "WordPress \x1b[38:5:76mfound\x1b[00m, Skiping initialization\n"
 fi

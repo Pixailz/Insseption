@@ -22,6 +22,8 @@ RUN			wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.
 			-O /usr/local/bin/wp && \
 			chmod +x ./usr/local/bin/wp
 
+#=#=#
+
 FROM		base			AS packed
 
 RUN			adduser -S nginx &&	addgroup -S nginx

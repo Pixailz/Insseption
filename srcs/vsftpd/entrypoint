@@ -1,7 +1,5 @@
 #!/bin/ash
 
-exec 2>&1
-
 if [ "${DEBUG}" != "0" ]; then
 	printf "debuging \x1b[38:5:39mVsFTPd\x1b[00m \n\n"
 	printf "FTP_USER          %s\n" "${FTP_USER}"
@@ -9,13 +7,12 @@ if [ "${DEBUG}" != "0" ]; then
 	printf "FTP_PORT          %s\n" "${FTP_PORT}"
 	printf "FTP_PASV_MIN_PORT %s\n" "${FTP_PASV_MIN_PORT}"
 	printf "FTP_PASV_MAX_PORT %s\n" "${FTP_PASV_MAX_PORT}"
+	printf "CERT_SUBJ         %s\n" "${CERT_SUBJ}"
 	printf "DEBUG             %s\n\n" "${DEBUG}"
 fi
 
-if [ ! -d /etc/vsftpd/ssl ]; then
-
-	printf "VsFTPd \x1b[38:5:160mnot found\x1b[00m, initialize it\n"
-
+function	ftp_create_ssl()
+{
 	mkdir -p /etc/vsftpd/ssl
 	openssl req \
 		-x509 \
@@ -23,12 +20,13 @@ if [ ! -d /etc/vsftpd/ssl ]; then
 		-sha256 \
 		-nodes \
 		-days 365 \
-		-subj "/C=FR/ST=Charen/L=Angou/O=420verfl0w/OU=Security/CN=420overfl0w"	\
+		-subj "${CERT_SUBJ}" \
 		-keyout /etc/vsftpd/ssl/vsftpd-selfsigned.key \
 		-out /etc/vsftpd/ssl/vsftpd-selfsigned.crt
+}
 
-	mkdir -p /var/log/vsftpd
-
+function	ftp_configure()
+{
 	<< EOFCONF cat > /etc/vsftpd/vsftpd.conf
 # Port Config
 listen=YES
@@ -73,11 +71,18 @@ ssl_ciphers=HIGH
 rsa_cert_file=/etc/vsftpd/ssl/vsftpd-selfsigned.crt
 rsa_private_key_file=/etc/vsftpd/ssl/vsftpd-selfsigned.key
 EOFCONF
-
 	echo "${FTP_USER}" > /etc/vsftpd/allowed_users
+}
+
+if [ ! -f /etc/vsftpd/allowed_users ]; then
+	printf "VsFTPd \x1b[38:5:160mnot found\x1b[00m, initialize it\n"
+	ftp_configure
+	ftp_create_ssl
 else
 	printf "VsFTPd \x1b[38:5:76mfound\x1b[00m, Skiping initialization\n"
 fi
+
+chown -R ${FTP_USER}:${FTP_USER} /home/${FTP_USER}
 
 printf "VsFTPd launched on port: \x1b[38:5:208m${FTP_PORT}\x1b[00m\n"
 

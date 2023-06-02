@@ -5,6 +5,8 @@ RUN			apk add --update \
 				openssl \
 			&& rm -f /var/cache/apk/*
 
+#=#=#
+
 FROM		base			AS packed
 
 COPY		--chown=root:root default.conf /etc/nginx/http.d/default.conf

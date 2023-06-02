@@ -5,6 +5,8 @@ RUN			apk add --update \
 				mariadb-client \
 			&& rm -f /var/cache/apk/*
 
+#=#=#
+
 FROM		base			AS packed
 
 COPY		--chown=root:root entrypoint /run

@@ -2,12 +2,8 @@
 
 ## TODO
 
-- check that everything work fine
-  - do some refactoring
-- do monitoring (ref B2BR) onto the makefile
-  - decide how, maybe a file in each docker to stats out
-  - which stat (only up ?)
-- finish the DOT ENV section
+- put the brief onto the makefile, portainer already do the stat
+  - finish the DOT ENV section
 
 ## HOWTO
 
