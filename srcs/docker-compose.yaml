@@ -109,9 +109,6 @@ services:
     environment:
       - REDIS_PASS=${ADMIN_PASS}
       - DEBUG=${DEBUG:-0}
-    # depends_on:
-    #   wordpress:
-    #     condition: service_healthy
     networks:
       main_net:
         ipv4_address: "13.37.42.15"
@@ -158,6 +155,7 @@ services:
       - FTP_DATA_PORT=${FTP_DATA_PORT:-20}
       - FTP_PASV_MIN_PORT=${FTP_PASV_MIN_PORT:-10000}
       - FTP_PASV_MAX_PORT=${FTP_PASV_MAX_PORT:-10100}
+      - CERT_SUBJ=${CERT_SUBJ}
       - DEBUG=${DEBUG:-0}
     depends_on:
       nginx:
