@@ -4,9 +4,9 @@ version: "3.9"
 # DEFAULT CONF https://stackoverflow.com/a/65522511
 
 x-healthcheck_conf: &healthcheck_conf
-      interval: 2s
+      interval: 1s
       timeout: 1s
-      retries: 20
+      retries: 50
 
 ################################################################################
 
