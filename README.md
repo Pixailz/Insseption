@@ -2,6 +2,7 @@
 
 ## TODO
 
+- put conf in conf dir etc.
 - put the brief onto the makefile, portainer already do the stat
   - finish the DOT ENV section
 
