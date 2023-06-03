@@ -1,6 +1,6 @@
 #!/bin/ash
 
-if [ "${DEBUG}" != "0" ]; then
+if [ "${DEBUG}" != "" ]; then
 	printf "debuging \x1b[38:5:39mPortainer\x1b[00m \n\n"
 	printf "ADMIN_PASS %s\n" "${ADMIN_PASS}"
 	printf "CERT_SUBJ  %s\n" "${CERT_SUBJ}"

@@ -1,6 +1,6 @@
 #!/bin/ash
 
-if [ "${DEBUG}" != "0" ]; then
+if [ "${DEBUG}" != "" ]; then
 	printf "debuging \x1b[38:5:39mWordPress\x1b[00m \n\n"
 	printf "WP_TITLE       %s\n" "${WP_TITLE}"
 	printf "WP_ROOT        %s\n" "${WP_ROOT}"
