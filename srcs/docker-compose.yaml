@@ -23,7 +23,7 @@ services:
       - DB_ADMIN_USER=${ADMIN_USER}
       - DB_ADMIN_PASS=${ADMIN_PASS}
       - DB_NAME=${DB_NAME}
-      - DEBUG=${DEBUG:-0}
+      - DEBUG=${DEBUG}
     networks:
       main_net:
         ipv4_address: "13.37.42.12"
@@ -52,7 +52,7 @@ services:
       - DB_NAME=${DB_NAME}
       - CERT_SUBJ=${CERT_SUBJ}
       - REDIS_PASS=${ADMIN_PASS}
-      - DEBUG=${DEBUG:-0}
+      - DEBUG=${DEBUG}
     depends_on:
       mariadb:
         condition: service_healthy
@@ -80,7 +80,7 @@ services:
       target: packed
     environment:
       - CERT_SUBJ=${CERT_SUBJ}
-      - DEBUG=${DEBUG:-0}
+      - DEBUG=${DEBUG}
     depends_on:
       wordpress:
         condition: service_healthy
@@ -108,7 +108,7 @@ services:
       target: packed
     environment:
       - REDIS_PASS=${ADMIN_PASS}
-      - DEBUG=${DEBUG:-0}
+      - DEBUG=${DEBUG}
     networks:
       main_net:
         ipv4_address: "13.37.42.15"
@@ -126,7 +126,7 @@ services:
       context: "./static_site"
       target: "packed"
     environment:
-      - DEBUG=${DEBUG:-0}
+      - DEBUG=${DEBUG}
     depends_on:
       nginx:
         condition: service_healthy
@@ -156,7 +156,7 @@ services:
       - FTP_PASV_MIN_PORT=${FTP_PASV_MIN_PORT:-10000}
       - FTP_PASV_MAX_PORT=${FTP_PASV_MAX_PORT:-10100}
       - CERT_SUBJ=${CERT_SUBJ}
-      - DEBUG=${DEBUG:-0}
+      - DEBUG=${DEBUG}
     depends_on:
       nginx:
         condition: service_healthy
@@ -185,7 +185,7 @@ services:
       target: "packed"
     environment:
       - ADMIN_PASS=${ADMIN_PASS}
-      - DEBUG=${DEBUG:-0}
+      - DEBUG=${DEBUG}
     depends_on:
       mariadb:
         condition: service_healthy
@@ -212,7 +212,7 @@ services:
     environment:
       - CERT_SUBJ=${CERT_SUBJ}
       - ADMIN_PASS=${ADMIN_PASS}
-      - DEBUG=${DEBUG:-0}
+      - DEBUG=${DEBUG}
     ports:
       - 9443:9443
     volumes:
