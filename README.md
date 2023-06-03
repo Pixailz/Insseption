@@ -79,10 +79,9 @@ CERT_SUBJ="/C=FR/ST=Charen/L=Angou/O=420verfl0w/OU=Security/CN=420overfl0w"
 
 ### MAKEFILE
 
-
 ```txt
 make all the dir into the `${HOME}/data` folder
-$(PRI)Makefile create the '$${HOME}/data' dir automatically and also
+Makefile create the '$${HOME}/data' dir automatically and also
 copy the '.env.template' into '.env' if it not exists
 
 the folloing rules have a variable TARGET to set for specifying the

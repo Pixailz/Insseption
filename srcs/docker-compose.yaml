@@ -213,9 +213,6 @@ services:
       - CERT_SUBJ=${CERT_SUBJ}
       - ADMIN_PASS=${ADMIN_PASS}
       - DEBUG=${DEBUG:-0}
-    depends_on:
-      wordpress:
-        condition: service_healthy
     ports:
       - 9443:9443
     volumes:
