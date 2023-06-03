@@ -9,8 +9,7 @@ if [ ! -f /var/www/html/index.html ]; then
 	printf "Static Site \x1b[38:5:160mnot found\x1b[00m, initialize it\n"
 	cp -r /tmp/static_site/* /var/www/html/
 	rm -rf /tmp/static_site
+	printf "Static Site copied at \x1b[38:5:208m/var/www/html\x1b[00m\n"
 else
 	printf "Static Site \x1b[38:5:76mfound\x1b[00m, Skiping initialization\n"
 fi
-
-printf "Static Site copied at \x1b[38:5:208m/var/www/html\x1b[00m\n"
