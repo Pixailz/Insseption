@@ -1,2 +1,7 @@
 # .env file never push this file, never.
 srcs/.env
+
+# downloaded thing
+srcs/wordpress/latest.tar.gz
+srcs/wordpress/wp
+srcs/portainer/latest.tar.gz

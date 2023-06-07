@@ -9,6 +9,6 @@ RUN			apk add --update \
 FROM		base		AS packed
 
 COPY		--chown=root:root portainer.db data/
-COPY		--chown=root:root entrypoint /
+COPY		--chown=root:root entrypoint latest.tar.gz /run
 
-ENTRYPOINT	[ "/entrypoint" ]
+ENTRYPOINT	[ "/run/entrypoint" ]

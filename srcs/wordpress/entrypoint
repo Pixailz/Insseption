@@ -9,17 +9,21 @@ if [ "${DEBUG}" != "" ]; then
 	printf "WP_NORMAL_USER %s\n" "${WP_NORMAL_USER}"
 	printf "WP_NORMAL_PASS %s\n" "${WP_NORMAL_PASS}"
 	printf "DB_NAME        %s\n" "${DB_NAME}"
-	printf "REDIS_PASS     %s\n" "${REDIS_PWD}"
+	printf "REDIS_USER     %s\n" "${REDIS_USER}"
+	printf "REDIS_PASS     %s\n" "${REDIS_PASS}"
 	printf "DEBUG          %s\n\n" "${DEBUG}"
 fi
 
-function	wp_download()
+function	wp_extract()
 {
 	cd /var/www/html/
 
-	wget https://wordpress.org/latest.tar.gz -O latest.tar.gz
-	tar xf latest.tar.gz && rm -rf latest.tar.gz
-
+	if [ ! -f /run/latest.tar.gz ]; then
+		wget https://wordpress.org/latest.tar.gz -O latest.tar.gz
+		tar xf latest.tar.gz
+	else
+		tar xf /run/latest.tar.gz
+	fi
 	if [ "${WP_ROOT}" != "wordpress" ]; then
 		mv wordpress "${WP_ROOT}"
 	fi
@@ -49,19 +53,31 @@ function	wp_configure()
 	wp theme activate twentytwentytwo
 }
 
+function	add_line()
+{
+	local str="${@}"
+
+	sed -i "$((++line_id))i ${1}" wp-config.php
+}
+
 function	wp_configure_redis()
 {
-	# enable redis cache
-	sed -i "40i define( 'WP_REDIS_HOST', 'redis' );" wp-config.php
-	sed -i "41i define( 'WP_REDIS_PORT', 6379 );" wp-config.php
-	sed -i "42i define( 'WP_REDIS_PASSWORD', '${REDIS_PWD}' );" wp-config.php
-	sed -i "42i define( 'WP_REDIS_TIMEOUT', 1 );" wp-config.php
-	sed -i "43i define( 'WP_REDIS_READ_TIMEOUT', 1 );" wp-config.php
-	sed -i "44i define( 'WP_REDIS_DATABASE', 0 );\n" wp-config.php
+	line_id="39"
+	add_line ""
+	add_line "/* Redis config */"
 
-	redis-cli -h redis flushall
+	add_line "define( 'WP_REDIS_HOST', 'redis' );"
+	add_line "define( 'WP_REDIS_PORT', 6379 );"
+	add_line "define( 'WP_REDIS_DATABASE', 0 );"
+	add_line "define( 'WP_REDIS_TIMEOUT', 1 );"
+	add_line "define( 'WP_REDIS_READ_TIMEOUT', 1 );"
+
+	add_line ""
+	add_line "/* Enable cache */"
+	add_line "define( 'WP_CACHE', true );"
 
 	wp plugin install redis-cache --activate
+	wp redis enable
 }
 
 function	wp_hardening()
@@ -74,13 +90,15 @@ function	wp_hardening()
 if [ ! -d /var/www/html/wordpress ]; then
 	printf "WordPress \x1b[38:5:160mnot found\x1b[00m, initialize it\n"
 
-	wp_download
+	wp_extract
 	wp_configure
 	wp_configure_redis
 	wp_hardening
 else
 	printf "WordPress \x1b[38:5:76mfound\x1b[00m, Skiping initialization\n"
 fi
+
+rm -rf /run/latest.tar.gz
 
 printf "WordPress launched on port: \x1b[38:5:208m9000\x1b[00m\n"
 

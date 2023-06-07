@@ -1,11 +1,5 @@
 # Insseption
 
-## TODO
-
-- put conf in conf dir etc.
-- put the brief onto the makefile, portainer already do the stat
-  - finish the DOT ENV section
-
 ## SOME DOCX
 
 First, docker / compose have a very good documentation, check out some link:
@@ -15,6 +9,8 @@ First, docker / compose have a very good documentation, check out some link:
 - [Compose](https://docs.docker.com/compose/compose-file/)
   - [Compose V3](https://docs.docker.com/compose/compose-file/compose-file-v3/)
   - [`compose` (CLI)](https://docs.docker.com/compose/reference/)
+
+search alpine package [here](https://pkgs.alpinelinux.org/packages)
 
 ### What's docker
 

@@ -23,9 +23,7 @@ function	portainer_create_cert()
 
 function	portainer_configure()
 {
-	wget https://github.com/portainer/portainer/releases/download/2.18.3/portainer-2.18.3-linux-amd64.tar.gz \
-		-O latest.tar.gz
-	tar xvf latest.tar.gz && rm latest.tar.gz
+	tar xf /run/latest.tar.gz && rm /run/latest.tar.gz
 	mv portainer /data/portainer
 	printf "${ADMIN_PASS}" > /data/admin_pass
 }

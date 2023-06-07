@@ -1,5 +1,10 @@
+# CONFIG
 SHELL				:= /bin/bash
+DOCKER_COMPOSE		:= docker compose -f ./srcs/docker-compose.yaml
+CURL				:= curl -L -\#
+ENV_FILE			:= srcs/.env
 
+# VOLUMES DIR
 SHARE_BASE			:= ${HOME}/data
 SHARE_DIR			:= mariadb \
 					   nginx \
@@ -12,8 +17,18 @@ SHARE_DIR			:= mariadb \
 
 SHARE_DIR			:= $(addprefix $(SHARE_BASE)/,$(SHARE_DIR))
 
-DOCKER_COMPOSE		:= docker compose -f ./srcs/docker-compose.yaml
+# PACKAGE TO DOWNLOAD
+WORDPRESS_PACKAGE	:= srcs/wordpress/latest.tar.gz
+WP_CLI_PACKAGE		:= srcs/wordpress/wp
+PORTAINER_PACKAGE	:= srcs/portainer/latest.tar.gz
 
+WORDPRESS_LINK		:= https://wordpress.org/latest.tar.gz
+PORTAINER_LINK		:= https://github.com/portainer/portainer/releases/download/2.18.3/portainer-2.18.3-linux-amd64.tar.gz
+WP_CLI_LINK			:= https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+
+PACKAGES			:= $(WORDPRESS_PACKAGE) $(PORTAINER_PACKAGE) $(WP_CLI_PACKAGE)
+
+# UTILS
 MKDIR				= \
 $(shell [ -f $(1) ] && rm -f $(1)) \
 $(shell [ ! -d $(1) ] && mkdir -p $(1))
@@ -23,13 +38,11 @@ RE_STR				:= --no-cache
 endif
 
 ifneq ($(ENTRY),)
-ENTRYPOINT				:= --entrypoint $(ENTRY)
+ENTRYPOINT			:= --entrypoint $(ENTRY)
 endif
 
 RE_STR				?=
 TARGET				?=
-
-ENV_FILE			:= srcs/.env
 
 ESC					:=\x1b[
 PRI					:=$(ESC)37m
@@ -104,6 +117,7 @@ endef
 export USAGE
 
 
+# RULES
 .PHONY:				up run build kill exec re clean fclean $(SHARE_DIR)
 
 up:					build
@@ -112,7 +126,7 @@ up:					build
 run:				build
 	$(DOCKER_COMPOSE) run -it $(ENTRYPOINT) $(TARGET)
 
-build:				$(SHARE_DIR) $(ENV_FILE)
+build:				$(PACKAGES) $(SHARE_DIR) $(ENV_FILE)
 	$(DOCKER_COMPOSE) build $(TARGET) $(RE_STR)
 
 kill:
@@ -120,6 +134,15 @@ kill:
 
 exec:
 	$(DOCKER_COMPOSE) exec -it $(TARGET) ash
+
+$(WORDPRESS_PACKAGE):
+	$(CURL) $(WORDPRESS_LINK) --output $@
+
+$(WP_CLI_PACKAGE):
+	$(CURL) $(WP_CLI_LINK) --output $@
+
+$(PORTAINER_PACKAGE):
+	$(CURL) $(PORTAINER_LINK) --output $@
 
 re:					clean up
 

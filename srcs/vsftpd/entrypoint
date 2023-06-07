@@ -82,7 +82,8 @@ else
 	printf "VsFTPd \x1b[38:5:76mfound\x1b[00m, Skiping initialization\n"
 fi
 
-chown -R ${FTP_USER}:${FTP_USER} /home/${FTP_USER}
+chgrp -R "${FTP_USER}" "/home/${FTP_USER}"
+chmod -R g=rwx "/home/${FTP_USER}"
 
 printf "VsFTPd launched on port: \x1b[38:5:208m${FTP_PORT}\x1b[00m\n"
 

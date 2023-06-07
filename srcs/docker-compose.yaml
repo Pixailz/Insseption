@@ -51,6 +51,7 @@ services:
       - WP_NORMAL_PASS=${NORMAL_PASS}
       - DB_NAME=${DB_NAME}
       - CERT_SUBJ=${CERT_SUBJ}
+      - REDIS_USER=${ADMIN_USER}
       - REDIS_PASS=${ADMIN_PASS}
       - DEBUG=${DEBUG}
     depends_on:
@@ -107,6 +108,7 @@ services:
       context: "./redis"
       target: packed
     environment:
+      - REDIS_USER=${ADMIN_USER}
       - REDIS_PASS=${ADMIN_PASS}
       - DEBUG=${DEBUG}
     networks:
@@ -158,8 +160,7 @@ services:
       - CERT_SUBJ=${CERT_SUBJ}
       - DEBUG=${DEBUG}
     depends_on:
-      nginx:
-        condition: service_healthy
+      - static_site
     ports:
       - ${FTP_PORT:-21}:${FTP_PORT:-21}
       - ${FTP_DATA_PORT:-20}:${FTP_DATA_PORT:-20}
@@ -257,24 +258,24 @@ volumes:
   ##############################################################################
 
   ##############################################################################
-  # VSFTPD CONFIG
-  vsftpd_conf:
-    driver: local
-    driver_opts:
-      type: "none"
-      o: "bind"
-      device: ${HOME}/data/vsftpd
-  #
-  ##############################################################################
-
-  ##############################################################################
-  # VSFTPD CONFIG
+  # Nginx CONFIG
   nginx_conf:
     driver: local
     driver_opts:
       type: "none"
       o: "bind"
       device: ${HOME}/data/nginx
+  #
+  ##############################################################################
+
+  ##############################################################################
+  # VsFTPd CONFIG
+  vsftpd_conf:
+    driver: local
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: ${HOME}/data/vsftpd
   #
   ##############################################################################
 
