@@ -151,8 +151,6 @@ services:
         FTP_USER: ${ADMIN_USER}
         FTP_PASS: ${ADMIN_PASS}
     environment:
-      - FTP_USER=${ADMIN_USER}
-      - FTP_PASS=${ADMIN_PASS}
       - FTP_PORT=${FTP_PORT:-21}
       - FTP_DATA_PORT=${FTP_DATA_PORT:-20}
       - FTP_PASV_MIN_PORT=${FTP_PASV_MIN_PORT:-10000}
