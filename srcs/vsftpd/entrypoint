@@ -27,50 +27,50 @@ function	ftp_create_ssl()
 
 function	ftp_configure()
 {
-	<< EOFCONF cat > /etc/vsftpd/vsftpd.conf
-# Port Config
-listen=YES
-listen_address=0.0.0.0
-listen_port=${FTP_PORT}
-ftp_data_port=${FTP_DATA_PORT}
+	<<-EOFCONF cat > /etc/vsftpd/vsftpd.conf
+		# Port Config
+		listen=YES
+		listen_address=0.0.0.0
+		listen_port=${FTP_PORT}
+		ftp_data_port=${FTP_DATA_PORT}
 
-background=NO
-local_enable=YES
-write_enable=YES
+		background=NO
+		local_enable=YES
+		write_enable=YES
 
-# Configuring Chroot
-chroot_local_user=YES
-chroot_list_enable=NO
-allow_writeable_chroot=YES
+		# Configuring Chroot
+		chroot_local_user=YES
+		chroot_list_enable=NO
+		allow_writeable_chroot=YES
 
-# Enable Passv
-pasv_enable=YES
-pasv_promiscuous=YES
-pasv_address=0.0.0.0
-pasv_min_port=${FTP_PASV_MIN_PORT}
-pasv_max_port=${FTP_PASV_MAX_PORT}
+		# Enable Passv
+		pasv_enable=YES
+		pasv_promiscuous=YES
+		pasv_address=0.0.0.0
+		pasv_min_port=${FTP_PASV_MIN_PORT}
+		pasv_max_port=${FTP_PASV_MAX_PORT}
 
-# hardening
-anonymous_enable=NO
-seccomp_sandbox=NO
-hide_ids=YES
-anonymous_enable=NO
+		# hardening
+		anonymous_enable=NO
+		seccomp_sandbox=NO
+		hide_ids=YES
+		anonymous_enable=NO
 
-## allow list
-userlist_deny=NO
-userlist_enable=YES
-userlist_file=/etc/vsftpd/allowed_users
+		## allow list
+		userlist_deny=NO
+		userlist_enable=YES
+		userlist_file=/etc/vsftpd/allowed_users
 
-## enable ssl
-ssl_enable=YES
-allow_anon_ssl=NO
-force_local_data_ssl=YES
-force_local_logins_ssl=YES
-require_ssl_reuse=NO
-ssl_ciphers=HIGH
-rsa_cert_file=/etc/vsftpd/ssl/vsftpd-selfsigned.crt
-rsa_private_key_file=/etc/vsftpd/ssl/vsftpd-selfsigned.key
-EOFCONF
+		## enable ssl
+		ssl_enable=YES
+		allow_anon_ssl=NO
+		force_local_data_ssl=YES
+		force_local_logins_ssl=YES
+		require_ssl_reuse=NO
+		ssl_ciphers=HIGH
+		rsa_cert_file=/etc/vsftpd/ssl/vsftpd-selfsigned.crt
+		rsa_private_key_file=/etc/vsftpd/ssl/vsftpd-selfsigned.key
+	EOFCONF
 	echo "${FTP_USER}" > /etc/vsftpd/allowed_users
 }
 
