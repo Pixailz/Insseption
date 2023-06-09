@@ -1,7 +1,7 @@
 #!/bin/ash
 
 if [ "${DEBUG}" != "" ]; then
-	printf "debuging \x1b[38:5:39mWordPress\x1b[00m \n\n"
+	printf "debuging \x1b[38;5;39mWordPress\x1b[00m \n\n"
 	printf "WP_TITLE       %s\n" "${WP_TITLE}"
 	printf "WP_ROOT        %s\n" "${WP_ROOT}"
 	printf "WP_ADMIN_USER  %s\n" "${WP_ADMIN_USER}"
@@ -76,6 +76,8 @@ function	wp_configure_redis()
 	add_line "/* Enable cache */"
 	add_line "define( 'WP_CACHE', true );"
 
+	redis-cli -h redis flushall
+
 	wp plugin install redis-cache --activate
 	wp redis enable
 }
@@ -87,19 +89,19 @@ function	wp_hardening()
 	wp plugin update --all
 }
 
-if [ ! -d /var/www/html/wordpress ]; then
-	printf "WordPress \x1b[38:5:160mnot found\x1b[00m, initialize it\n"
+if [ ! -d "/var/www/html/${WP_ROOT}" ]; then
+	printf "WordPress \x1b[38;5;160mnot found\x1b[00m, initialize it\n"
 
 	wp_extract
 	wp_configure
 	wp_configure_redis
 	wp_hardening
 else
-	printf "WordPress \x1b[38:5:76mfound\x1b[00m, Skiping initialization\n"
+	printf "WordPress \x1b[38;5;76mfound\x1b[00m, Skiping initialization\n"
 fi
 
 rm -rf /run/latest.tar.gz
 
-printf "WordPress launched on port: \x1b[38:5:208m9000\x1b[00m\n"
+printf "WordPress launched on port: \x1b[38;5;208m9000\x1b[00m\n"
 
 /usr/sbin/php-fpm81 -F -R

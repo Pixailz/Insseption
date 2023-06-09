@@ -5,13 +5,36 @@ if [ "${DEBUG}" != "" ]; then
 	printf "DEBUG         %s\n\n" "${DEBUG}"
 fi
 
-if [ ! -f /var/www/html/adminer.php ]; then
+BASE_DIR="/var/www/html/adminer"
+
+function	adminer_configure()
+{
+	mkdir -p "${BASE_DIR}"
+	curl -L "http://www.adminer.org/latest.php" --output "${BASE_DIR}/adminer.php"
+}
+
+function	adminer_enable_plugin()
+{
+	mkdir -p "${BASE_DIR}/plugins"
+	curl -L "https://raw.githubusercontent.com/vrana/adminer/master/plugins/plugin.php" \
+		--output "${BASE_DIR}/plugins/plugin.php"
+	curl -L "https://raw.githubusercontent.com/vrana/adminer/master/plugins/sql-log.php" \
+		--output "${BASE_DIR}/plugins/sql-log.php"
+}
+
+if [ ! -f "${BASE_DIR}/adminer.php" ]; then
 	printf "Adminer \x1b[38:5:160mnot found\x1b[00m, initialize it\n"
-	curl -L "http://www.adminer.org/latest.php" --output /var/www/html/adminer.php
+
+	adminer_configure
+	adminer_enable_plugin
 else
 	printf "Adminer \x1b[38:5:76mfound\x1b[00m, Skiping initialization\n"
 fi
 
 printf "Adminer launched on port: \x1b[38:5:208m80\x1b[00m\n"
 
-/usr/bin/php -S 0.0.0.0:80 /var/www/html/adminer.php
+cd ${BASE_DIR}
+
+/usr/bin/php \
+	-S 0.0.0.0:80 \
+	-t ${BASE_DIR}

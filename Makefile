@@ -11,9 +11,12 @@ SHARE_DIR			:= mariadb \
 					   www_root \
 					   vsftpd \
 					   portainer \
+					   redis \
 					   log/wordpress \
 					   log/nginx \
-					   log/mariadb
+					   log/mariadb \
+					   log/vsftpd \
+					   log/redis
 
 SHARE_DIR			:= $(addprefix $(SHARE_BASE)/,$(SHARE_DIR))
 
@@ -118,7 +121,7 @@ export USAGE
 
 
 # RULES
-.PHONY:				up run build kill exec re clean fclean $(SHARE_DIR)
+.PHONY:				up run build kill exec re clean fclean make_sym_link $(SHARE_DIR)
 
 up:					build
 	$(DOCKER_COMPOSE) up $(TARGET)
@@ -126,7 +129,7 @@ up:					build
 run:				build
 	$(DOCKER_COMPOSE) run -it $(ENTRYPOINT) $(TARGET)
 
-build:				$(PACKAGES) $(SHARE_DIR) $(ENV_FILE)
+build:				$(PACKAGES) make_sym_link $(SHARE_DIR) $(ENV_FILE)
 	$(DOCKER_COMPOSE) build $(TARGET) $(RE_STR)
 
 kill:
@@ -143,6 +146,11 @@ $(WP_CLI_PACKAGE):
 
 $(PORTAINER_PACKAGE):
 	$(CURL) $(PORTAINER_LINK) --output $@
+
+make_sym_link:
+ifeq ($(shell [ -L ./data_dir ] && printf "1" || printf "0" ),0)
+	ln -s ${HOME}/data ${PWD}/data_dir
+endif
 
 re:					clean up
 

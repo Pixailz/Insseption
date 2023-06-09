@@ -50,11 +50,25 @@ function	ftp_configure()
 		pasv_min_port=${FTP_PASV_MIN_PORT}
 		pasv_max_port=${FTP_PASV_MAX_PORT}
 
+		# Logging
+
+		## BASE
+		xferlog_enable=YES
+		xferlog_file=/var/vsftpd/xferlog
+		xferlog_std_format=YES
+
+		## MORE VERBOSE
+		log_ftp_protocol=YES
+		vsftpd_log_file=/var/vsftpd/vsftpd.log
+		syslog_enable=NO
+
+		## ENABLE THE TWO FILE ABOVE
+		dual_log_enable=YES
+
 		# hardening
 		anonymous_enable=NO
 		seccomp_sandbox=NO
 		hide_ids=YES
-		anonymous_enable=NO
 
 		## allow list
 		userlist_deny=NO
@@ -71,7 +85,20 @@ function	ftp_configure()
 		rsa_cert_file=/etc/vsftpd/ssl/vsftpd-selfsigned.crt
 		rsa_private_key_file=/etc/vsftpd/ssl/vsftpd-selfsigned.key
 	EOFCONF
+
 	echo "${FTP_USER}" > /etc/vsftpd/allowed_users
+}
+
+function	ftp_fix_permission()
+{
+	[ ! -d /var/vsftpd ] && mkdir -p /var/vsftpd
+	[ ! -f /var/vsftpd/xferlog ] && touch /var/vsftpd/xferlog
+	[ ! -f /var/vsftpd/vsftpd.log ] && touch /var/vsftpd/vsftpd.log
+
+	chgrp -R "${FTP_USER}" "/home/${FTP_USER}"
+	chmod -R g=rwx "/home/${FTP_USER}"
+	chgrp -R "${FTP_USER}" "/var/vsftpd"
+	chmod -R g=rwx "/var/vsftpd"
 }
 
 if [ ! -f /etc/vsftpd/allowed_users ]; then
@@ -82,8 +109,7 @@ else
 	printf "VsFTPd \x1b[38:5:76mfound\x1b[00m, Skiping initialization\n"
 fi
 
-chgrp -R "${FTP_USER}" "/home/${FTP_USER}"
-chmod -R g=rwx "/home/${FTP_USER}"
+ftp_fix_permission
 
 printf "VsFTPd launched on port: \x1b[38:5:208m${FTP_PORT}\x1b[00m\n"
 

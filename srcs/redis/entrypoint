@@ -6,15 +6,24 @@ if [ "${DEBUG}" != "" ]; then
 	printf "DEBUG      %s\n\n" "${DEBUG}"
 fi
 
-function	redis_configure()
+function	redis_edit_config()
 {
-	cp /etc/redis.conf /etc/redis.conf.bak
-	sed -i "s|bind 127.0.0.1|#bind 127.0.0.1|g" /etc/redis.conf
-	sed -i "s|# maxmemory <bytes>|maxmemory 256mb|g" /etc/redis.conf
-	sed -i "s|# maxmemory-policy noeviction|maxmemory-policy allkeys-lru|g" /etc/redis.conf
+	local	str_from="${1}"
+	local	str_to="${2:-}"
+
+	sed -i "s|${str_from}|${str_to}|g" /etc/redis/redis.conf
 }
 
-if [ ! -f /etc/redis.conf.bak ]; then
+function	redis_configure()
+{
+	cp /etc/redis.conf /etc/redis/redis.conf && rm /etc/redis.conf
+	redis_edit_config "bind 127.0.0.1" "#bind 127.0.0.1"
+	touch /var/log/redis/redis.log
+	redis_edit_config "# maxmemory <bytes>" "maxmemory 256mb"
+	redis_edit_config "# maxmemory-policy noeviction" "maxmemory-policy allkeys-lru"
+}
+
+if [ ! -f /etc/redis/redis.conf ]; then
 	printf "Redis \x1b[38:5:160mnot found\x1b[00m, initialize it\n"
 
 	redis_configure
@@ -24,4 +33,4 @@ fi
 
 printf "Redis launched on port: \x1b[38:5:208m6379\x1b[00m\n"
 
-redis-server --protected-mode no
+redis-server /etc/redis/redis.conf --protected-mode no

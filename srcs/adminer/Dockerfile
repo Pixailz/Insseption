@@ -11,6 +11,8 @@ RUN			apk add --update \
 
 FROM		base			AS packed
 
+COPY		--chown=root:root index.php /var/www/html/adminer/index.php
+COPY		--chown=root:root hydra.css /var/www/html/adminer/adminer.css
 COPY		--chown=root:root entrypoint /run
 
 ENTRYPOINT	[ "/run/entrypoint" ]

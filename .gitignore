@@ -5,3 +5,6 @@ srcs/.env
 srcs/wordpress/latest.tar.gz
 srcs/wordpress/wp
 srcs/portainer/latest.tar.gz
+
+# symlink for ${HOME}/data folder
+data_dir

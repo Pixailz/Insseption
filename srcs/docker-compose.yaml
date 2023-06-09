@@ -8,6 +8,9 @@ x-healthcheck_conf: &healthcheck_conf
       timeout: 1s
       retries: 50
 
+x-restart: &restart
+    restart: on-failure
+
 ################################################################################
 
 services:
@@ -25,11 +28,12 @@ services:
       - DB_NAME=${DB_NAME}
       - DEBUG=${DEBUG}
     networks:
-      main_net:
+      inception_net:
         ipv4_address: "13.37.42.12"
     volumes:
       - maria_db:/var/lib/mysql
       - log_mariadb:/var/log/mariadb
+    << : *restart
     healthcheck:
       test: [ "CMD", "pgrep", "mysqld" ]
       << : *healthcheck_conf
@@ -60,11 +64,12 @@ services:
       redis:
         condition: service_healthy
     networks:
-      main_net:
+      inception_net:
         ipv4_address: "13.37.42.11"
     volumes:
       - www_root:/var/www/html
       - log_wordpress:/var/log/php81
+    << : *restart
     healthcheck:
       test: [ "CMD", "pgrep", "php81" ]
       << : *healthcheck_conf
@@ -88,12 +93,13 @@ services:
     ports:
       - 443:443
     networks:
-      main_net:
+      inception_net:
         ipv4_address: "13.37.42.10"
     volumes:
       - nginx_conf:/etc/nginx
       - www_root:/var/www/html
       - log_nginx:/var/log/nginx
+    << : *restart
     healthcheck:
       test: [ "CMD", "pgrep", "nginx" ]
       << : *healthcheck_conf
@@ -112,8 +118,12 @@ services:
       - REDIS_PASS=${ADMIN_PASS}
       - DEBUG=${DEBUG}
     networks:
-      main_net:
+      inception_net:
         ipv4_address: "13.37.42.15"
+    volumes:
+      - redis_conf:/etc/redis
+      - log_redis:/var/log/redis
+    << : *restart
     healthcheck:
       test: [ "CMD", "pgrep", "redis" ]
       << : *healthcheck_conf
@@ -133,8 +143,9 @@ services:
       nginx:
         condition: service_healthy
     networks:
-      main_net:
+      inception_net:
         ipv4_address: "13.37.42.16"
+    << : *restart
     volumes:
       - www_root:/var/www/html
   #
@@ -151,6 +162,7 @@ services:
         FTP_USER: ${ADMIN_USER}
         FTP_PASS: ${ADMIN_PASS}
     environment:
+      - FTP_USER=${ADMIN_USER}
       - FTP_PORT=${FTP_PORT:-21}
       - FTP_DATA_PORT=${FTP_DATA_PORT:-20}
       - FTP_PASV_MIN_PORT=${FTP_PASV_MIN_PORT:-10000}
@@ -164,11 +176,13 @@ services:
       - ${FTP_DATA_PORT:-20}:${FTP_DATA_PORT:-20}
       - ${FTP_PASV_MIN_PORT:-10000}-${FTP_PASV_MAX_PORT:-10100}:${FTP_PASV_MIN_PORT:-10000}-${FTP_PASV_MAX_PORT:-10100}
     networks:
-      main_net:
+      inception_net:
         ipv4_address: "13.37.42.13"
     volumes:
       - www_root:/home/${ADMIN_USER}
       - vsftpd_conf:/etc/vsftpd
+      - log_vsftpd:/var/vsftpd
+    << : *restart
     healthcheck:
       test: [ "CMD", "pgrep", "vsftpd" ]
       << : *healthcheck_conf
@@ -193,8 +207,9 @@ services:
     volumes:
       - www_root:/var/www/html
     networks:
-      main_net:
+      inception_net:
         ipv4_address: "13.37.42.17"
+    << : *restart
     healthcheck:
       test: [ "CMD", "pgrep", "php" ]
       << : *healthcheck_conf
@@ -218,8 +233,9 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data
     networks:
-      main_net:
+      inception_net:
         ipv4_address: "13.37.42.18"
+    << : *restart
     healthcheck:
       test: [ "CMD", "pgrep", "portainer" ]
       << : *healthcheck_conf
@@ -229,11 +245,11 @@ services:
 networks:
   ##############################################################################
   # MAIN INTERNAL NETWORK
-  main_net:
-    name: main_net
+  inception_net:
+    name: inception_net
     driver: bridge
     driver_opts:
-      com.docker.network.bridge.name: main_net
+      com.docker.network.bridge.name: inception
     ipam:
       driver: default
       config:
@@ -289,13 +305,24 @@ volumes:
   ##############################################################################
 
   ##############################################################################
-  # Portainer build
+  # Portainer
   portainer_data:
     driver: local
     driver_opts:
       type: "none"
       o: "bind"
       device: ${HOME}/data/portainer
+  #
+  ##############################################################################
+
+  ##############################################################################
+  # Redis
+  redis_conf:
+    driver: local
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: ${HOME}/data/redis
   #
   ##############################################################################
 
@@ -321,5 +348,19 @@ volumes:
       type: "none"
       o: "bind"
       device: ${HOME}/data/log/wordpress
+
+  log_vsftpd:
+    driver: local
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: ${HOME}/data/log/vsftpd
+
+  log_redis:
+    driver: local
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: ${HOME}/data/log/redis
   #
   ##############################################################################
