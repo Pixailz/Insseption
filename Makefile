@@ -124,9 +124,24 @@ $(RST)
 endef
 export USAGE
 
+SET_VAR				= \
+var_pos="$$(grep -n $(1) ./srcs/.env | cut -d':' -f1)" ; \
+sed -i "$${var_pos}d" ./srcs/.env ; \
+sed -i "$${var_pos}i$(1)=$(2)" ./srcs/.env ; \
+printf "var %b%s%b " "$(G)" "$(1)" "$(RST)" ; \
+printf "set to %b%s%b\n" "$(R)" "$(2)" "$(RST)" ;
+
+SET_PASS			= \
+printf "%bNormal%b pass\n" "$(G)" "$(RST)" ; \
+read -s -a NORMAL_PASS ; \
+$(call SET_VAR,NORMAL_PASS,$${NORMAL_PASS}) \
+printf "%bAdmin%b pass\n" "$(R)" "$(RST)" ; \
+read -s -a ADMIN_PASS ; \
+$(call SET_VAR,ADMIN_PASS,$${ADMIN_PASS})
+
 
 # RULES
-.PHONY:				up run build kill exec re clean fclean make_sym_link $(SHARE_DIR)
+.PHONY:				up run build kill exec re clean fclean make_sym_link $(SHARE_DIR) $(ENV_FILE)
 
 up:					build
 	$(DOCKER_COMPOSE) up $(TARGET)
@@ -173,7 +188,8 @@ fclean:				kill clean
 	docker network rm $(shell docker network ls -q) 2>/dev/null; true
 
 $(ENV_FILE):
-	cp ./srcs/.env{.template,}
+	cp -f ./srcs/.env{.template,}
+	@$(call SET_PASS)
 
 $(SHARE_DIR):
 	$(call MKDIR,$(@))
