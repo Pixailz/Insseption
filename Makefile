@@ -48,8 +48,13 @@ RE_STR				?=
 TARGET				?=
 
 ESC					:=\x1b[
-PRI					:=$(ESC)37m
-SEC					:=$(ESC)38:5:208m
+R					:=$(ESC)38;5;196m
+G					:=$(ESC)38;5;112m
+B					:=$(ESC)38;5;27m
+O					:=$(ESC)38;5;208m
+
+PRI					:=$(G)
+SEC					:=$(O)
 RST					:=$(ESC)00m
 
 define USAGE
