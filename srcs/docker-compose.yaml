@@ -206,6 +206,7 @@ services:
       - 80:80
     volumes:
       - www_root:/var/www/html
+      - log_adminer:/var/log/adminer
     networks:
       inception_net:
         ipv4_address: "13.37.42.17"
@@ -362,5 +363,12 @@ volumes:
       type: "none"
       o: "bind"
       device: ${HOME}/data/log/redis
+
+  log_adminer:
+    driver: local
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: ${HOME}/data/log/adminer
   #
   ##############################################################################

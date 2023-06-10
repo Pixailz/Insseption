@@ -16,6 +16,7 @@ SHARE_DIR			:= mariadb \
 					   log/nginx \
 					   log/mariadb \
 					   log/vsftpd \
+					   log/adminer \
 					   log/redis
 
 SHARE_DIR			:= $(addprefix $(SHARE_BASE)/,$(SHARE_DIR))
