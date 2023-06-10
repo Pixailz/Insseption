@@ -133,10 +133,10 @@ printf "set to %b%s%b\n" "$(R)" "$(2)" "$(RST)" ;
 
 SET_PASS			= \
 printf "%bNormal%b pass\n" "$(G)" "$(RST)" ; \
-read -s -a NORMAL_PASS ; \
+read -s NORMAL_PASS ; \
 $(call SET_VAR,NORMAL_PASS,$${NORMAL_PASS}) \
 printf "%bAdmin%b pass\n" "$(R)" "$(RST)" ; \
-read -s -a ADMIN_PASS ; \
+read -s ADMIN_PASS ; \
 $(call SET_VAR,ADMIN_PASS,$${ADMIN_PASS})
 
 
