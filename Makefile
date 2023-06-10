@@ -58,69 +58,69 @@ SEC					:=$(O)
 RST					:=$(ESC)00m
 
 define USAGE
-$(PRI)Makefile create the '$(SEC)$${HOME}/data$(RST)' dir automatically and also
-copy the '$(SEC).env.template$(RST)' into '$(SEC).env$(RST)' if it not exists
+$(PRI)Makefile create the '$(SEC)$${HOME}/data$(PRI)' dir automatically and also
+copy the '$(SEC).env.template$(PRI)' into '$(SEC).env$(PRI)' if it not exists
 
-the folloing rules have a variable $(SEC)TARGET$(RST) to set for specifying the
+the folloing rules have a variable $(SEC)TARGET$(PRI) to set for specifying the
 target to affect.
 
-- $(SEC)up$(RST)
-- $(SEC)run$(RST)
-- $(SEC)build$(RST)
-- $(SEC)kill$(RST)
-- $(SEC)exec$(RST)
+- $(SEC)up$(PRI)
+- $(SEC)run$(PRI)
+- $(SEC)build$(PRI)
+- $(SEC)kill$(PRI)
+- $(SEC)exec$(PRI)
 
 exemples:
-'make exec $(SEC)TARGET=mariadb$(RST)'
+'make exec $(SEC)TARGET=mariadb$(PRI)'
 	will run 'ash' (alpine bash shell) on a running mariadb container
-'make up $(SEC)TARGET=nginx$(RST)'
+'make up $(SEC)TARGET=nginx$(PRI)'
 	will make up nginx container
 
 
-if $(SEC)TARGET$(RST) is not specified all the services are targeted
+if $(SEC)TARGET$(PRI) is not specified all the services are targeted
 
-the exec rules can take a $(SEC)EXEC$(RST) variable wich specify what to
+the exec rules can take a $(SEC)EXEC$(PRI) variable wich specify what to
 launch (ex: 'ash', 'ps aux')
 
-	$(SEC)up$(RST)
+	$(SEC)up$(PRI)
 		call 'build', and then call 'docker compose up' to make the whole
 		project UP and running
 
-	$(SEC)run$(RST)
+	$(SEC)run$(PRI)
 		call 'build', and then call 'docker compose run -it' to run a containers
 
-	$(SEC)build$(RST)
+	$(SEC)build$(PRI)
 		call '$$(SHARE_DIR)' and '$$(ENV_FILE)', and then call 'docker compose
 		build' to first build the containers
 
-	$(SEC)kill$(RST)
+	$(SEC)kill$(PRI)
 		call 'docker compose kill' to kill all the current running containers
 
-	$(SEC)exec$(RST)
+	$(SEC)exec$(PRI)
 		call 'docker compose exec -it' to pop a shell on a containers
 
-	$(SEC)re$(RST)
+	$(SEC)re$(PRI)
 		call 'clean' and then 'up'
 
-	$(SEC)fre$(RST)
+	$(SEC)fre$(PRI)
 		call 'fclean' and then 'up', nd specify --no-cache to docker compose
 		build that make redownloading the base image
 
-	$(SEC)clean$(RST)
+	$(SEC)clean$(PRI)
 		clean the $${HOME}/data folder, by removing it
 
-	$(SEC)fclean$(RST)
+	$(SEC)fclean$(PRI)
 		call 'clean', and remove all volumes, networks, and images on the host
 
-	$(SEC)$$(ENV_FILE)$(RST)
+	$(SEC)$$(ENV_FILE)$(PRI)
 		copy the './srcs/.env.template' onto './srcs/.env'
 
-	$(SEC)$$(SHARE_DIR)$(RST)
+	$(SEC)$$(SHARE_DIR)$(PRI)
 		make all the dir into the '$${HOME}/data' folder
 
-	$(SEC)help$(RST)
+	$(SEC)help$(PRI)
 		display this help message
-
+$(RST)
 endef
 export USAGE
 
