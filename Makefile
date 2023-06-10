@@ -112,8 +112,12 @@ launch (ex: 'ash', 'ps aux')
 	$(SEC)fclean$(PRI)
 		call 'clean', and remove all volumes, networks, and images on the host
 
+	$(SEC)reset_env$(PRI)
+		copy the './srcs/.env.template' onto './srcs/.env' and then read from
+		stdin the NORMAL_PASS and ADMIN_PASS
+
 	$(SEC)$$(ENV_FILE)$(PRI)
-		copy the './srcs/.env.template' onto './srcs/.env'
+		call 'reset_env'
 
 	$(SEC)$$(SHARE_DIR)$(PRI)
 		make all the dir into the '$${HOME}/data' folder
@@ -141,7 +145,7 @@ $(call SET_VAR,ADMIN_PASS,$${ADMIN_PASS})
 
 
 # RULES
-.PHONY:				up run build kill exec re clean fclean make_sym_link $(SHARE_DIR) $(ENV_FILE)
+.PHONY:				up run build kill exec re clean fclean make_sym_link $(SHARE_DIR)
 
 up:					build
 	$(DOCKER_COMPOSE) up $(TARGET)
@@ -187,9 +191,11 @@ fclean:				kill clean
 	docker volume rm $(shell docker volume ls -q) 2>/dev/null; true
 	docker network rm $(shell docker network ls -q) 2>/dev/null; true
 
-$(ENV_FILE):
+reset_env:
 	cp -f ./srcs/.env{.template,}
 	@$(call SET_PASS)
+
+$(ENV_FILE):		reset_env
 
 $(SHARE_DIR):
 	$(call MKDIR,$(@))
