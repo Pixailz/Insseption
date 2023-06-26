@@ -1,33 +1,6 @@
 # Insseption
 
-## SOME DOCX
-
-First, docker / compose have a very good documentation, check out some link:
-
-- [Dockerfile](https://docs.docker.com/engine/reference/builder/)
-  - [`docker` (CLI)](https://docs.docker.com/engine/reference/commandline/cli/)
-- [Compose](https://docs.docker.com/compose/compose-file/)
-  - [Compose V3](https://docs.docker.com/compose/compose-file/compose-file-v3/)
-  - [`compose` (CLI)](https://docs.docker.com/compose/reference/)
-
-search alpine package [here](https://pkgs.alpinelinux.org/packages)
-
-### What's docker
-
-https://www.youtube.com/watch?v=-YnMr1lj4Z8
-> a very good video on how docker works
-
-TL;DR
-Docker use Containerd, that manage little Container, that use Runc, to unshare Namespaces to simulate a 'spaces' where an user can be root, but stay a regular user outside of that namespace.
-
-### How to install
-
-- [installing docker engine](https://docs.docker.com/engine/install/)
-  - [Debian](https://docs.docker.com/engine/install/debian)
-  - [Ubuntu](https://docs.docker.com/engine/install/ubuntu)
-- [installing docker rootless](https://docs.docker.com/engine/security/rootless/)
-> installing in rootless means that docker will not have root privileges on host
-> more secure in prod
+SOME DOCX [HERE](https://github.com/Pixailz/inception_dock)
 
 ## HOWTO
 
